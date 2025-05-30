@@ -65,3 +65,9 @@ repos:
         language: system
         pass_filenames: false
         files: api/
+      - id: biome-check
+        name: "🌳 Biome Check"
+        entry: sh -c 'cd ui && npx @biomejs/biome check --apply .'
+        language: system
+        types: [file]
+        files: \.(js|ts|jsx|tsx|json)$
