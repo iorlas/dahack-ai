@@ -85,7 +85,8 @@
 			"mhutchie.git-graph",
 			"humao.rest-client",
 			"github.github-vscode-theme",
-			"biomejs.biome"
+			"biomejs.biome",
+			"ms-azuretools.vscode-docker"
 		]
 	},
 }

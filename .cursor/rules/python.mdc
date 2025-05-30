@@ -65,3 +65,7 @@ alwaysApply: true
      - Structure routes and dependencies clearly to optimize readability and maintainability.
 
   Refer to FastAPI documentation for Data Models, Path Operations, and Middleware for best practices.
+
+  Additional rules:
+  - Avoid creating `__init__` files
+  - Use modern, most recent standards in FastAPI and typings, based on python 3.12
