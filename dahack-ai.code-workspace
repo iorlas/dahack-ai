@@ -1,6 +1,10 @@
 {
 	"folders": [
 		{
+			"name": "Repository",
+			"path": "."
+		},
+		{
 			"name": "UI",
 			"path": "ui"
 		},
@@ -15,47 +19,12 @@
 		{
 			"name": "E2E",
 			"path": "e2e"
-		},
-		{
-			"name": "Repository",
-			"path": "."
 		}
 	],
 	"settings": {
 		"[python]": {
 			"editor.defaultFormatter": "charliermarsh.ruff"
 		},
-		"cSpell.words": [
-			"adamviola",
-			"autofetch",
-			"bierner",
-			"calt",
-			"Cascadia",
-			"charliermarsh",
-			"codesearch",
-			"debugpy",
-			"donjayamanne",
-			"emojisense",
-			"Fira",
-			"githistory",
-			"gruntfuggly",
-			"humao",
-			"inforce",
-			"kevinrose",
-			"liga",
-			"mechatroner",
-			"mhutchie",
-			"Monaspace",
-			"mypy",
-			"nefrob",
-			"njpwerner",
-			"pycache",
-			"pyright",
-			"pytest",
-			"tamasfe",
-			"venv",
-			"zhuangtongfa"
-		],
 		"editor.codeActionsOnSave": {
 			"source.fixAll": "explicit",
 			"source.organizeImports": "always"
@@ -94,15 +63,9 @@
 		"git.autofetch": true,
 		"git.confirmSync": false,
 		"git.postCommitCommand": "push",
-		"github.copilot.chat.agent.thinkingTool": true,
-		"github.copilot.chat.codeGeneration.useInstructionFiles": true,
-		"github.copilot.chat.codesearch.enabled": true,
-		"github.copilot.nextEditSuggestions.enabled": true,
-		"redhat.telemetry.enabled": false,
 		"terminal.integrated.fontSize": 12,
 		"workbench.colorTheme": "GitHub Dark",
 		"workbench.settings.editor": "json",
-		"workbench.startupEditor": "readme",
 		"workbench.tree.indent": 18,
 	},
 	"extensions": {
