@@ -1,0 +1,128 @@
+{
+	"folders": [
+		{
+			"name": "UI",
+			"path": "ui"
+		},
+		{
+			"name": "API",
+			"path": "api"
+		},
+		{
+			"name": "Infra",
+			"path": "infra"
+		},
+		{
+			"name": "E2E",
+			"path": "e2e"
+		},
+		{
+			"name": "Repository",
+			"path": "."
+		}
+	],
+	"settings": {
+		"[python]": {
+			"editor.defaultFormatter": "charliermarsh.ruff"
+		},
+		"cSpell.words": [
+			"adamviola",
+			"autofetch",
+			"bierner",
+			"calt",
+			"Cascadia",
+			"charliermarsh",
+			"codesearch",
+			"debugpy",
+			"donjayamanne",
+			"emojisense",
+			"Fira",
+			"githistory",
+			"gruntfuggly",
+			"humao",
+			"inforce",
+			"kevinrose",
+			"liga",
+			"mechatroner",
+			"mhutchie",
+			"Monaspace",
+			"mypy",
+			"nefrob",
+			"njpwerner",
+			"pycache",
+			"pyright",
+			"pytest",
+			"tamasfe",
+			"venv",
+			"zhuangtongfa"
+		],
+		"editor.codeActionsOnSave": {
+			"source.fixAll": "explicit",
+			"source.organizeImports": "always"
+		},
+		"editor.cursorBlinking": "smooth",
+		"editor.fontFamily": "'JetBrainsMono Nerd Font', 'Droid Sans Mono', 'monospace', monospace",
+		"editor.fontLigatures": true,
+		"editor.formatOnSave": true,
+		"editor.minimap.renderCharacters": false,
+		"editor.minimap.size": "fill",
+		"editor.rulers": [
+			100,
+			120
+		],
+		"explorer.confirmDragAndDrop": false,
+		"explorer.sortOrder": "type",
+		"files.autoSave": "afterDelay",
+		"files.exclude": {
+			// Python
+			"**/__pycache__": true,
+			"**/.coverage": true,
+			"**/.mypy_cache": true,
+			"**/.next": true,
+			"**/.pytest_cache": true,
+			"**/.ruff_cache": true,
+			"**/.tox": true,
+			"**/.venv": true,
+			"**/*.pyc": true,
+			"**/*.pyd": true,
+			"**/*.pyo": true,
+			// Typescript
+			"**/node_modules": true
+		},
+		"git.allowForcePush": true,
+		"git.allowNoVerifyCommit": true,
+		"git.autofetch": true,
+		"git.confirmSync": false,
+		"git.postCommitCommand": "push",
+		"github.copilot.chat.agent.thinkingTool": true,
+		"github.copilot.chat.codeGeneration.useInstructionFiles": true,
+		"github.copilot.chat.codesearch.enabled": true,
+		"github.copilot.nextEditSuggestions.enabled": true,
+		"redhat.telemetry.enabled": false,
+		"terminal.integrated.fontSize": 12,
+		"workbench.colorTheme": "GitHub Dark",
+		"workbench.settings.editor": "json",
+		"workbench.startupEditor": "readme",
+		"workbench.tree.indent": 18,
+	},
+	"extensions": {
+		"recommendations": [
+			"charliermarsh.ruff",
+			"gruntfuggly.todo-tree",
+			"nefrob.vscode-just-syntax",
+			"mechatroner.rainbow-csv",
+			"kevinrose.vsc-python-indent",
+			"ms-python.debugpy",
+			"ms-python.python",
+			"adamviola.parquet-explorer",
+			"donjayamanne.githistory",
+			"figma.figma-vscode-extension",
+			"tamasfe.even-better-toml",
+			"njpwerner.autodocstring",
+			"mhutchie.git-graph",
+			"humao.rest-client",
+			"github.github-vscode-theme",
+			"biomejs.biome"
+		]
+	},
+}
