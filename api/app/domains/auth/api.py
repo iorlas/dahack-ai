@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from structlog import get_logger
 
 from app.domains.auth.contact_service import contact_service
@@ -35,8 +35,6 @@ async def register(user_data: UserRegister) -> User:
     # Create new user
     user = await auth_service.create_user(username=user_data.username, password=user_data.password)
 
-    user = await auth_service.create_user(username=user_data.username, password=user_data.password)
-
     logger.info("user_registered", username=user.username, user_id=user.id)
     return user
 
@@ -59,7 +57,7 @@ async def login(user_data: UserLogin) -> dict:
 
 
 @router.get("/me", response_model=UserResponse)
-async def get_current_user(current_user: CurrentActiveUser) -> User:
+async def get_current_user(current_user: User = Depends(get_current_active_user)) -> User:
     """Get current authenticated user."""
     return current_user
 
