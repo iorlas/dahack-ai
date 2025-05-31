@@ -31,11 +31,11 @@ class TokenData(BaseModel):
 
 
 class UserResponse(BaseModel):
+    class Config:
+        from_attributes = True
+
     id: int
     username: str
     is_active: bool
     created_at: datetime
     updated_at: datetime
-
-    class Config:
-        from_attributes = True 

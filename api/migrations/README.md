@@ -56,4 +56,4 @@ SELECT * FROM _sql_migrations ORDER BY applied_at;
 3. Never modify existing migration files
 4. Use descriptive names
 5. Include both UP operations (create/alter) in the file
-6. For complex migrations, add comments explaining the changes 
+6. For complex migrations, add comments explaining the changes

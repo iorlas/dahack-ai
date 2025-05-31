@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 from jose import JWTError, jwt
 from passlib.context import CryptContext
@@ -30,9 +30,7 @@ class AuthService:
     def create_access_token(data: dict) -> str:
         """Create a JWT access token."""
         to_encode = data.copy()
-        expire = datetime.now(timezone.utc) + timedelta(
-            minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES
-        )
+        expire = datetime.now(UTC) + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
         to_encode.update({"exp": expire})
         encoded_jwt = jwt.encode(to_encode, settings.SECRET_KEY, algorithm=ALGORITHM)
         return encoded_jwt
@@ -42,10 +40,13 @@ class AuthService:
         """Verify and decode a JWT token."""
         try:
             payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[ALGORITHM])
-            username: str = payload.get("sub")
-            exp: datetime = datetime.fromtimestamp(payload.get("exp"), tz=timezone.utc)
-            if username is None:
+            username = payload.get("sub")
+            exp_timestamp = payload.get("exp")
+
+            if username is None or exp_timestamp is None:
                 return None
+
+            exp = datetime.fromtimestamp(exp_timestamp, tz=UTC)
             return TokenData(username=username, exp=exp)
         except JWTError:
             return None
@@ -70,4 +71,4 @@ class AuthService:
         return user
 
 
-auth_service = AuthService() 
+auth_service = AuthService()

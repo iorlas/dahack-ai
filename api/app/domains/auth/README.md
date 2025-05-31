@@ -76,7 +76,7 @@ response = httpx.post(
 
 # Login
 response = httpx.post(
-    "http://localhost:8000/v1/auth/login", 
+    "http://localhost:8000/v1/auth/login",
     json={"username": "testuser", "password": "securepass123"}
 )
 token = response.json()["access_token"]
@@ -106,4 +106,4 @@ python run_migrations.py
 aerich init-db  # First time only
 aerich migrate --name add_users_table
 aerich upgrade
-``` 
+```

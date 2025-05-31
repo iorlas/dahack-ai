@@ -8,8 +8,5 @@ class User(BaseModel):
     hashed_password = fields.CharField(max_length=128)
     is_active = fields.BooleanField(default=True)
 
-    class Meta:
-        table = "users"
-
     def __str__(self):
-        return self.username 
+        return self.username
