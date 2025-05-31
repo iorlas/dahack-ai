@@ -26,15 +26,28 @@ dependencies = [
     "pytest-cov>=4.1.0",
     "testcontainers>=3.7.1",
     "asyncpg>=0.29.0",
+    "redis>=5.0.1",
+    "boto3>=1.34.69",
+    "aioboto3>=12.3.0",
+    "aiofiles>=24.1.0",
+    "mypy-boto3-s3>=1.38.26",
+    "types-pyyaml>=6.0.12.20250516",
 ]
 
 [tool.ruff]
 line-length = 100
 target-version = "py312"
+
+[tool.ruff.lint]
 select = ["E", "F", "B", "I", "N", "UP", "PL", "RUF"]
 ignore = []
 
-[tool.ruff.isort]
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "auto"
+
+[tool.ruff.lint.isort]
 known-first-party = ["app"]
 
 [tool.pytest.ini_options]
