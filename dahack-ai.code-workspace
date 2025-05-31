@@ -88,7 +88,8 @@
 			"humao.rest-client",
 			"github.github-vscode-theme",
 			"biomejs.biome",
-			"ms-azuretools.vscode-docker"
+			"ms-azuretools.vscode-docker",
+			"ms-playwright.playwright"
 		]
 	},
 }
