@@ -62,7 +62,7 @@ Response: 200 OK
 
 #### 4. Send Contact Invitation
 ```
-POST /v1/auth/contacts/invite
+POST /v1/contacts/invite
 Authorization: Bearer <token>
 Content-Type: application/json
 
@@ -75,7 +75,6 @@ Response: 200 OK
   "id": 1,
   "from_user": { /* user object */ },
   "to_user": { /* user object */ },
-  "status": "invited",
   "created_at": "2024-01-01T00:00:00",
   "updated_at": "2024-01-01T00:00:00"
 }
@@ -83,7 +82,7 @@ Response: 200 OK
 
 #### 5. Accept Contact Invitation
 ```
-POST /v1/auth/contacts/{invitation_id}/accept
+POST /v1/contacts/{invitation_id}/accept
 Authorization: Bearer <token>
 
 Response: 200 OK
@@ -97,7 +96,7 @@ Response: 200 OK
 
 #### 6. Reject Contact Invitation
 ```
-DELETE /v1/auth/contacts/{invitation_id}/reject
+POST /v1/contacts/{invitation_id}/reject
 Authorization: Bearer <token>
 
 Response: 204 No Content
@@ -105,19 +104,19 @@ Response: 204 No Content
 
 #### 7. Get Contacts
 ```
-GET /v1/auth/contacts
+GET /v1/contacts
 Authorization: Bearer <token>
 
 Response: 200 OK
 {
   "sent_invitations": [
-    { /* contact objects with status="invited" */ }
+    { /* invitation objects */ }
   ],
   "received_invitations": [
-    { /* contact objects with status="invited" */ }
+    { /* invitation objects */ }
   ],
   "contacts": [
-    { /* contact objects with status="accepted" */ }
+    { /* contact objects with other_user field */ }
   ]
 }
 ```
@@ -152,21 +151,21 @@ response = httpx.post(
 
 # Login
 response = httpx.post(
-    "http://localhost:8000/v1/auth/login",
+    "http://localhost:8000/v1/auth/login", 
     json={"username": "testuser", "password": "securepass123"}
 )
 token = response.json()["access_token"]
 
 # Send contact invitation
 response = httpx.post(
-    "http://localhost:8000/v1/auth/contacts/invite",
+    "http://localhost:8000/v1/contacts/invite",
     json={"username": "otheruser"},
     headers={"Authorization": f"Bearer {token}"}
 )
 
 # Get contacts
 response = httpx.get(
-    "http://localhost:8000/v1/auth/contacts",
+    "http://localhost:8000/v1/contacts",
     headers={"Authorization": f"Bearer {token}"}
 )
 ```
