@@ -63,3 +63,16 @@ class RoomMember(BaseModel):
 
     def __str__(self):
         return f"{self.user} in {self.room}"
+
+
+class Message(BaseModel):
+    class Meta:
+        table = "messages"
+
+    room = fields.ForeignKeyField("models.Room", related_name="messages")
+    sender = fields.ForeignKeyField("models.User", related_name="sent_messages")
+    content = fields.TextField()
+    edited_at = fields.DatetimeField(null=True)
+
+    def __str__(self):
+        return f"Message({self.id}, room={self.room_id}, sender={self.sender_id})"

@@ -1,3 +1,4 @@
+import asyncio
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -10,6 +11,8 @@ from app.core.redis import redis_service
 from app.core.s3 import s3_service
 from app.domains.auth.api import router as auth_router
 from app.domains.auth.contacts_api import router as contacts_router
+from app.domains.auth.messages_api import redis_listener
+from app.domains.auth.messages_api import router as messages_router
 from app.domains.auth.rooms_api import router as rooms_router
 from app.domains.health.api import router as health_router
 
@@ -37,7 +40,19 @@ async def shutdown_event():
 async def lifespan(app: FastAPI):
     await init_db()
     await startup_event()
+
+    # Start Redis listener for WebSocket messages
+    redis_task = asyncio.create_task(redis_listener())
+
     yield
+
+    # Cancel Redis listener
+    redis_task.cancel()
+    try:
+        await redis_task
+    except asyncio.CancelledError:
+        pass
+
     await close_db()
     await shutdown_event()
 
@@ -58,3 +73,4 @@ app.include_router(health_router, prefix="/v1")
 app.include_router(auth_router, prefix="/v1")
 app.include_router(contacts_router, prefix="/v1")
 app.include_router(rooms_router, prefix="/v1")
+app.include_router(messages_router, prefix="/v1")

@@ -196,6 +196,37 @@ Authorization: Bearer <token>
 Response: 204 No Content
 ```
 
+### Messages
+
+#### 14. Get Message History
+```
+GET /v1/messages/rooms/{room_id}/history?limit=50&before_id=123
+Authorization: Bearer <token>
+
+Response: 200 OK
+{
+  "messages": [
+    {
+      "id": 1,
+      "room_id": 5,
+      "sender": { /* user object */ },
+      "content": "Hello!",
+      "edited_at": null,
+      "created_at": "2024-01-01T00:00:00",
+      "updated_at": "2024-01-01T00:00:00"
+    }
+  ],
+  "has_more": true
+}
+```
+
+#### 15. WebSocket for Real-time Messages
+```
+WS /v1/messages/ws
+```
+
+See [MESSAGING_SYSTEM.md](../../MESSAGING_SYSTEM.md) for detailed WebSocket protocol documentation.
+
 ## Contact Flow
 
 1. User A sends invitation to User B
@@ -210,6 +241,15 @@ Response: 204 No Content
 1. **System Rooms**: Auto-created when contacts connect, always 2 users, cannot be modified
 2. **User Rooms**: Created manually, owner can add/remove members from contacts
 
+## Messaging System
+
+Real-time messaging using WebSockets and Redis pub/sub:
+
+1. **WebSocket Connection**: Clients connect with JWT authentication
+2. **Room Subscriptions**: Clients subscribe to rooms they're members of
+3. **Message Flow**: Messages saved to DB and broadcast via Redis
+4. **Scalability**: Redis pub/sub enables horizontal scaling
+
 ## Security Features
 
 - Passwords salted and hashed with bcrypt
@@ -218,6 +258,8 @@ Response: 204 No Content
 - Password minimum length: 8 characters
 - Contact invitations require authentication
 - Users cannot add themselves as contacts
+- WebSocket connections require JWT authentication
+- Room membership validated for all message operations
 
 ## Usage Example
 
