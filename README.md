@@ -14,6 +14,7 @@ da-hack-ai/
 
 ## Prerequisites
 
+- Docker & Docker Compose
 - Node.js 20+
 - Python 3.11+
 - [pnpm](https://pnpm.io/) - Fast package manager
@@ -22,6 +23,22 @@ da-hack-ai/
 - [pre-commit](https://pre-commit.com/) - Git hooks
 
 ## Quick Start
+
+### Using Docker Compose (Recommended)
+
+```bash
+# Start all services (database, redis, minio, API, UI)
+docker-compose up
+
+# Services will be available at:
+# - Frontend: http://localhost:3000
+# - Backend API: http://localhost:8000
+# - MinIO Console: http://localhost:9001
+```
+
+Database migrations run automatically on startup. To add new migrations, see `api/migrations/README.md`.
+
+### Manual Setup
 
 1. **Setup Development Environment**
 ```bash

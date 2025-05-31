@@ -1,0 +1,27 @@
+# Development overrides for docker-compose
+# This file is automatically loaded by docker-compose in development
+
+services:
+  api:
+    environment:
+      - ENVIRONMENT=development
+    volumes:
+      - ./api:/app
+      - /app/.venv
+      # Mount migrations for live updates
+      - ./api/migrations:/app/migrations:ro
+
+  ui:
+    environment:
+      - NODE_ENV=development
+    volumes:
+      - ./ui:/app
+      - /app/node_modules
+      - /app/.next
+
+  migrate:
+    volumes:
+      - ./api:/app
+      - /app/.venv
+      # Mount migrations for live updates
+      - ./api/migrations:/app/migrations:ro 

@@ -17,13 +17,13 @@ repos:
       - id: check-merge-conflict
       - id: detect-private-key
 
-  - repo: https://github.com/compilerla/conventional-pre-commit
-    rev: v4.0.0
-    hooks:
-      - id: conventional-pre-commit
-        name: "🔖 Conventional Commit Msg"
-        stages: [commit-msg]
-        args: []
+  # - repo: https://github.com/compilerla/conventional-pre-commit
+  #   rev: v4.0.0
+  #   hooks:
+  #     - id: conventional-pre-commit
+  #       name: "🔖 Conventional Commit Msg"
+  #       stages: [commit-msg]
+  #       args: []
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: "v0.11.2"
