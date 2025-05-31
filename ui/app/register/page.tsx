@@ -1,6 +1,8 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { useRegister } from '../../lib/api';
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
@@ -10,6 +12,9 @@ export default function RegisterPage() {
   });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+
+  const router = useRouter();
+  const registerMutation = useRegister();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -39,8 +44,13 @@ export default function RegisterPage() {
       return;
     }
 
-    if (formData.password.length < 6) {
-      setError('Password too weak');
+    if (formData.password.length < 8) {
+      setError('Password must be at least 8 characters');
+      return;
+    }
+
+    if (formData.username.length < 3) {
+      setError('Username must be at least 3 characters');
       return;
     }
 
@@ -49,13 +59,29 @@ export default function RegisterPage() {
       return;
     }
 
-    // Mock successful registration
-    setSuccess('Registration successful');
+    try {
+      await registerMutation.mutateAsync({
+        username: formData.username,
+        password: formData.password,
+      });
 
-    // Simulate redirect after short delay
-    setTimeout(() => {
-      window.location.href = '/chat';
-    }, 1000);
+      setSuccess('Account created successfully');
+
+      // Redirect to login page after successful registration
+      setTimeout(() => {
+        router.push('/login');
+      }, 1000);
+    } catch (err) {
+      if (err instanceof Error) {
+        if (err.message.includes('Validation error')) {
+          setError(err.message.replace('Validation error: ', ''));
+        } else {
+          setError('Registration failed. Please try again.');
+        }
+      } else {
+        setError('Network error. Please try again.');
+      }
+    }
   };
 
   return (
@@ -67,10 +93,7 @@ export default function RegisterPage() {
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-300">
             Or{' '}
-            <a
-              href="/login"
-              className="font-medium text-blue-600 hover:text-blue-500"
-            >
+            <a href="/login" className="font-medium text-blue-600 hover:text-blue-500">
               already have account? Sign in
             </a>
           </p>
@@ -85,7 +108,6 @@ export default function RegisterPage() {
                 id="username"
                 name="username"
                 type="text"
-                required
                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
                 placeholder="Username"
                 value={formData.username}
@@ -100,7 +122,6 @@ export default function RegisterPage() {
                 id="password"
                 name="password"
                 type="password"
-                required
                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
                 placeholder="Password"
                 value={formData.password}
@@ -115,7 +136,6 @@ export default function RegisterPage() {
                 id="confirmPassword"
                 name="confirmPassword"
                 type="password"
-                required
                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
                 placeholder="Confirm Password"
                 value={formData.confirmPassword}
@@ -124,20 +144,17 @@ export default function RegisterPage() {
             </div>
           </div>
 
-          {error && (
-            <div className="text-red-600 text-sm text-center">{error}</div>
-          )}
+          {error && <div className="text-red-600 text-sm text-center">{error}</div>}
 
-          {success && (
-            <div className="text-green-600 text-sm text-center">{success}</div>
-          )}
+          {success && <div className="text-green-600 text-sm text-center">{success}</div>}
 
           <div>
             <button
               type="submit"
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              disabled={registerMutation.isPending}
+              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Register
+              {registerMutation.isPending ? 'Creating Account...' : 'Register'}
             </button>
           </div>
         </form>

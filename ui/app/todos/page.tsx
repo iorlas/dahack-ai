@@ -1,11 +1,6 @@
 'use client';
 
-import {
-  useCreateTodo,
-  useDeleteTodo,
-  useTodos,
-  useUpdateTodo,
-} from '@/lib/api';
+import { useCreateTodo, useDeleteTodo, useTodos, useUpdateTodo } from '@/lib/api';
 import { useState } from 'react';
 
 export default function TodoManager() {
@@ -70,10 +65,7 @@ export default function TodoManager() {
       {/* Todo List */}
       <div className="space-y-4">
         {todos?.map((todo) => (
-          <div
-            key={todo.id}
-            className="flex items-center justify-between p-4 bg-white rounded-lg shadow"
-          >
+          <div key={todo.id} className="flex items-center justify-between p-4 bg-white rounded-lg shadow">
             <div className="flex items-center gap-4">
               <input
                 type="checkbox"
@@ -87,16 +79,10 @@ export default function TodoManager() {
                 className="w-5 h-5 rounded border-gray-300 text-blue-500 focus:ring-blue-500"
               />
               <div>
-                <h3
-                  className={`text-lg font-medium ${
-                    todo.completed ? 'line-through text-gray-500' : ''
-                  }`}
-                >
+                <h3 className={`text-lg font-medium ${todo.completed ? 'line-through text-gray-500' : ''}`}>
                   {todo.title}
                 </h3>
-                {todo.description && (
-                  <p className="text-gray-600">{todo.description}</p>
-                )}
+                {todo.description && <p className="text-gray-600">{todo.description}</p>}
               </div>
             </div>
             <button
@@ -111,11 +97,7 @@ export default function TodoManager() {
       </div>
 
       {/* Empty State */}
-      {todos?.length === 0 && (
-        <div className="text-center text-gray-500 py-8">
-          No todos yet. Add one above!
-        </div>
-      )}
+      {todos?.length === 0 && <div className="text-center text-gray-500 py-8">No todos yet. Add one above!</div>}
     </div>
   );
 }

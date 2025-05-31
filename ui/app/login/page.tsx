@@ -1,6 +1,8 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { useLogin } from '../../lib/api';
 
 export default function LoginPage() {
   const [formData, setFormData] = useState({
@@ -8,6 +10,9 @@ export default function LoginPage() {
     password: '',
   });
   const [error, setError] = useState('');
+
+  const router = useRouter();
+  const loginMutation = useLogin();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -31,8 +36,27 @@ export default function LoginPage() {
       return;
     }
 
-    // Mock login - redirect to chat
-    window.location.href = '/chat';
+    try {
+      await loginMutation.mutateAsync({
+        username: formData.username,
+        password: formData.password,
+      });
+
+      // Redirect to chat
+      router.push('/chat');
+    } catch (err) {
+      if (err instanceof Error) {
+        if (err.message.includes('401')) {
+          setError('Invalid username or password');
+        } else if (err.message.includes('Validation error')) {
+          setError(err.message.replace('Validation error: ', ''));
+        } else {
+          setError('Login failed. Please try again.');
+        }
+      } else {
+        setError('Network error. Please try again.');
+      }
+    }
   };
 
   return (
@@ -44,11 +68,8 @@ export default function LoginPage() {
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-300">
             Or{' '}
-            <a
-              href="/register"
-              className="font-medium text-blue-600 hover:text-blue-500"
-            >
-              create a new account
+            <a href="/register" className="font-medium text-blue-600 hover:text-blue-500">
+              create account
             </a>
           </p>
         </div>
@@ -62,7 +83,6 @@ export default function LoginPage() {
                 id="username"
                 name="username"
                 type="text"
-                required
                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
                 placeholder="Username"
                 value={formData.username}
@@ -77,7 +97,6 @@ export default function LoginPage() {
                 id="password"
                 name="password"
                 type="password"
-                required
                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
                 placeholder="Password"
                 value={formData.password}
@@ -86,16 +105,15 @@ export default function LoginPage() {
             </div>
           </div>
 
-          {error && (
-            <div className="text-red-600 text-sm text-center">{error}</div>
-          )}
+          {error && <div className="text-red-600 text-sm text-center">{error}</div>}
 
           <div>
             <button
               type="submit"
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              disabled={loginMutation.isPending}
+              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Sign In
+              {loginMutation.isPending ? 'Signing In...' : 'Sign In'}
             </button>
           </div>
         </form>
