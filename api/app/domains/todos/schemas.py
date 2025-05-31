@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class TodoBase(BaseModel):
@@ -27,10 +27,14 @@ class TodoUpdate(BaseModel):
 
 
 class TodoInDB(TodoBase):
-    """Schema for todo data in database."""
-
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(
+        extra="ignore",
+        str_strip_whitespace=True,
+        validate_default=True,
+        validate_assignment=True,
+        from_attributes=True,
+        populate_by_name=True,
+    )
 
     id: int
     completed: bool

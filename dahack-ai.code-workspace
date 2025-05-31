@@ -10,7 +10,10 @@
 		},
 		{
 			"name": "API",
-			"path": "api"
+			"path": "api",
+			"settings": {
+				"python.defaultInterpreterPath": "./cdk/.venv/bin/python"
+			}
 		},
 		{
 			"name": "Infra",
@@ -79,7 +82,6 @@
 			"ms-python.python",
 			"adamviola.parquet-explorer",
 			"donjayamanne.githistory",
-			"figma.figma-vscode-extension",
 			"tamasfe.even-better-toml",
 			"njpwerner.autodocstring",
 			"mhutchie.git-graph",

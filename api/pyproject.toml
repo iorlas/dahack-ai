@@ -21,6 +21,11 @@ dependencies = [
     "tenacity>=8.2.3",
     "structlog>=24.1.0",
     "pyyaml>=6.0.1",
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.23.5",
+    "pytest-cov>=4.1.0",
+    "testcontainers>=3.7.1",
+    "asyncpg>=0.29.0",
 ]
 
 [tool.ruff]
@@ -33,9 +38,10 @@ ignore = []
 known-first-party = ["app"]
 
 [tool.pytest.ini_options]
-testpaths = ["tests"]
-python_files = ["test_*.py"]
 addopts = "-v --cov=app --cov-report=term-missing"
+asyncio_mode = "auto"
+# asyncio_default_fixture_loop_scope = "function"
+
 
 [dependency-groups]
-dev = ["pyright>=1.1.401", "ruff>=0.11.12"]
+dev = ["pyright>=1.1.401", "pytest-asyncio>=1.0.0", "ruff>=0.11.12"]
