@@ -39,3 +39,34 @@ class UserResponse(BaseModel):
     is_active: bool
     created_at: datetime
     updated_at: datetime
+
+
+class ContactInvite(BaseModel):
+    username: str = Field(..., description="Username of the user to invite")
+
+
+class InvitationResponse(BaseModel):
+    class Config:
+        from_attributes = True
+
+    id: int
+    from_user: UserResponse
+    to_user: UserResponse
+    created_at: datetime
+    updated_at: datetime
+
+
+class ContactResponse(BaseModel):
+    class Config:
+        from_attributes = True
+
+    id: int
+    other_user: UserResponse  # Will be populated with the other user in the contact
+    created_at: datetime
+    updated_at: datetime
+
+
+class ContactListResponse(BaseModel):
+    sent_invitations: list[InvitationResponse]
+    received_invitations: list[InvitationResponse]
+    contacts: list[ContactResponse]
