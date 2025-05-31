@@ -51,18 +51,18 @@ repos:
 
   - repo: local
     hooks:
-      - id: api-generate-openapi-spec
-        name: "📜 API: Generate OpenAPI Spec"
-        entry: sh -c 'cd api && source .venv/bin/activate && python -m app.generate_openapi'
-        language: system
-        pass_filenames: false
-        files: api/app/
       - id: pyright
         name: "🔍 Pyright Type Check"
         entry: sh -c 'cd api && uv run pyright'
         language: system
         types: [file]
         files: ^api/
+      - id: api-generate-openapi-spec
+        name: "📜 API: Generate OpenAPI Spec"
+        entry: sh -c 'cd api && source .venv/bin/activate && python -m app.generate_openapi'
+        language: system
+        pass_filenames: false
+        files: api/app/
       - id: biome-check
         name: "🌳 Biome Check"
         entry: sh -c 'cd ui && npx @biomejs/biome check --apply .'

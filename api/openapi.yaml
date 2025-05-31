@@ -16,160 +16,6 @@ paths:
           content:
             application/json:
               schema: {}
-  /v1/todos:
-    post:
-      tags:
-      - todos
-      summary: Create Todo
-      operationId: create_todo_v1_todos_post
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/TodoCreate'
-      responses:
-        '201':
-          description: Successful Response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Todo'
-        '422':
-          description: Validation Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
-    get:
-      tags:
-      - todos
-      summary: List Todos
-      description: List todos with optional filtering and pagination.
-      operationId: list_todos_v1_todos_get
-      parameters:
-      - name: completed
-        in: query
-        required: false
-        schema:
-          anyOf:
-          - type: boolean
-          - type: 'null'
-          title: Completed
-      - name: skip
-        in: query
-        required: false
-        schema:
-          type: integer
-          minimum: 0
-          default: 0
-          title: Skip
-      - name: limit
-        in: query
-        required: false
-        schema:
-          type: integer
-          maximum: 100
-          minimum: 1
-          default: 10
-          title: Limit
-      responses:
-        '200':
-          description: Successful Response
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Todo'
-                title: Response List Todos V1 Todos Get
-        '422':
-          description: Validation Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
-  /v1/todos/{todo_id}:
-    get:
-      tags:
-      - todos
-      summary: Get Todo
-      description: Get a todo by ID.
-      operationId: get_todo_v1_todos__todo_id__get
-      parameters:
-      - name: todo_id
-        in: path
-        required: true
-        schema:
-          type: string
-          title: Todo Id
-      responses:
-        '200':
-          description: Successful Response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Todo'
-        '422':
-          description: Validation Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
-    patch:
-      tags:
-      - todos
-      summary: Update Todo
-      description: Update a todo.
-      operationId: update_todo_v1_todos__todo_id__patch
-      parameters:
-      - name: todo_id
-        in: path
-        required: true
-        schema:
-          type: string
-          title: Todo Id
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/TodoUpdate'
-      responses:
-        '200':
-          description: Successful Response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Todo'
-        '422':
-          description: Validation Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
-    delete:
-      tags:
-      - todos
-      summary: Delete Todo
-      description: Delete a todo.
-      operationId: delete_todo_v1_todos__todo_id__delete
-      parameters:
-      - name: todo_id
-        in: path
-        required: true
-        schema:
-          type: string
-          title: Todo Id
-      responses:
-        '204':
-          description: Successful Response
-        '422':
-          description: Validation Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
   /v1/auth/register:
     post:
       tags:
@@ -238,41 +84,333 @@ paths:
                 $ref: '#/components/schemas/UserResponse'
       security:
       - HTTPBearer: []
+  /v1/contacts/invite:
+    post:
+      tags:
+      - contacts
+      summary: Send Contact Invitation
+      description: Send a contact invitation to another user.
+      operationId: send_contact_invitation_v1_contacts_invite_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContactInvite'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvitationResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+      - HTTPBearer: []
+  /v1/contacts/{invitation_id}/accept:
+    post:
+      tags:
+      - contacts
+      summary: Accept Contact Invitation
+      description: Accept a contact invitation.
+      operationId: accept_contact_invitation_v1_contacts__invitation_id__accept_post
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: invitation_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Invitation Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContactResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /v1/contacts/{invitation_id}/reject:
+    post:
+      tags:
+      - contacts
+      summary: Reject Contact Invitation
+      description: Reject a contact invitation.
+      operationId: reject_contact_invitation_v1_contacts__invitation_id__reject_post
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: invitation_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Invitation Id
+      responses:
+        '204':
+          description: Successful Response
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /v1/contacts:
+    get:
+      tags:
+      - contacts
+      summary: Get Contacts
+      description: Get all contacts for the current user.
+      operationId: get_contacts_v1_contacts_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContactListResponse'
+      security:
+      - HTTPBearer: []
+  /v1/contacts/check/{username}:
+    get:
+      tags:
+      - contacts
+      summary: Check Mutual Contact
+      description: Check if the current user and specified user are mutual contacts.
+      operationId: check_mutual_contact_v1_contacts_check__username__get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: username
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Username
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+                title: Response Check Mutual Contact V1 Contacts Check  Username  Get
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /v1/rooms:
+    get:
+      tags:
+      - rooms
+      summary: Get Rooms
+      description: Get all rooms where the current user is a member.
+      operationId: get_rooms_v1_rooms_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoomListResponse'
+      security:
+      - HTTPBearer: []
+    post:
+      tags:
+      - rooms
+      summary: Create Room
+      description: Create a new user-owned room.
+      operationId: create_room_v1_rooms_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoomCreate'
+        required: true
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoomResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+      - HTTPBearer: []
+  /v1/rooms/{room_id}:
+    get:
+      tags:
+      - rooms
+      summary: Get Room
+      description: Get a specific room if you are a member.
+      operationId: get_room_v1_rooms__room_id__get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: room_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Room Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoomResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    delete:
+      tags:
+      - rooms
+      summary: Delete Room
+      description: Delete a room (owner only).
+      operationId: delete_room_v1_rooms__room_id__delete
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: room_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Room Id
+      responses:
+        '204':
+          description: Successful Response
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /v1/rooms/{room_id}/members:
+    post:
+      tags:
+      - rooms
+      summary: Add Members
+      description: Add members to a user-owned room (owner only).
+      operationId: add_members_v1_rooms__room_id__members_post
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: room_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Room Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoomAddMembers'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoomResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /v1/rooms/{room_id}/leave:
+    post:
+      tags:
+      - rooms
+      summary: Leave Room
+      description: Leave a user-owned room.
+      operationId: leave_room_v1_rooms__room_id__leave_post
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: room_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Room Id
+      responses:
+        '204':
+          description: Successful Response
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
 components:
   schemas:
-    HTTPValidationError:
+    ContactInvite:
       properties:
-        detail:
-          items:
-            $ref: '#/components/schemas/ValidationError'
-          type: array
-          title: Detail
-      type: object
-      title: HTTPValidationError
-    Todo:
-      properties:
-        title:
+        username:
           type: string
-          maxLength: 255
-          minLength: 1
-          title: Title
-        description:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Description
-        due_date:
-          anyOf:
-          - type: string
-            format: date-time
-          - type: 'null'
-          title: Due Date
+          title: Username
+          description: Username of the user to invite
+      type: object
+      required:
+      - username
+      title: ContactInvite
+    ContactListResponse:
+      properties:
+        sent_invitations:
+          items:
+            $ref: '#/components/schemas/InvitationResponse'
+          type: array
+          title: Sent Invitations
+        received_invitations:
+          items:
+            $ref: '#/components/schemas/InvitationResponse'
+          type: array
+          title: Received Invitations
+        contacts:
+          items:
+            $ref: '#/components/schemas/ContactResponse'
+          type: array
+          title: Contacts
+      type: object
+      required:
+      - sent_invitations
+      - received_invitations
+      - contacts
+      title: ContactListResponse
+    ContactResponse:
+      properties:
         id:
           type: integer
           title: Id
-        completed:
-          type: boolean
-          title: Completed
+        other_user:
+          $ref: '#/components/schemas/UserResponse'
         created_at:
           type: string
           format: date-time
@@ -283,64 +421,139 @@ components:
           title: Updated At
       type: object
       required:
-      - title
       - id
-      - completed
+      - other_user
       - created_at
       - updated_at
-      title: Todo
-      description: Schema for todo response.
-    TodoCreate:
+      title: ContactResponse
+    HTTPValidationError:
       properties:
-        title:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    InvitationResponse:
+      properties:
+        id:
+          type: integer
+          title: Id
+        from_user:
+          $ref: '#/components/schemas/UserResponse'
+        to_user:
+          $ref: '#/components/schemas/UserResponse'
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+        updated_at:
+          type: string
+          format: date-time
+          title: Updated At
+      type: object
+      required:
+      - id
+      - from_user
+      - to_user
+      - created_at
+      - updated_at
+      title: InvitationResponse
+    RoomAddMembers:
+      properties:
+        usernames:
+          items:
+            type: string
+          type: array
+          minItems: 1
+          title: Usernames
+          description: Usernames to add to room
+      type: object
+      required:
+      - usernames
+      title: RoomAddMembers
+    RoomCreate:
+      properties:
+        name:
           type: string
           maxLength: 255
           minLength: 1
-          title: Title
-        description:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Description
-        due_date:
-          anyOf:
-          - type: string
-            format: date-time
-          - type: 'null'
-          title: Due Date
+          title: Name
+        member_usernames:
+          items:
+            type: string
+          type: array
+          title: Member Usernames
+          description: Usernames to add to room
       type: object
       required:
-      - title
-      title: TodoCreate
-      description: Schema for creating a new todo.
-    TodoUpdate:
+      - name
+      title: RoomCreate
+    RoomListResponse:
       properties:
-        title:
-          anyOf:
-          - type: string
-            maxLength: 255
-            minLength: 1
-          - type: 'null'
-          title: Title
-        description:
-          anyOf:
-          - type: string
-          - type: 'null'
-          title: Description
-        completed:
-          anyOf:
-          - type: boolean
-          - type: 'null'
-          title: Completed
-        due_date:
-          anyOf:
-          - type: string
-            format: date-time
-          - type: 'null'
-          title: Due Date
+        rooms:
+          items:
+            $ref: '#/components/schemas/RoomResponse'
+          type: array
+          title: Rooms
       type: object
-      title: TodoUpdate
-      description: Schema for updating a todo.
+      required:
+      - rooms
+      title: RoomListResponse
+    RoomMemberResponse:
+      properties:
+        user:
+          $ref: '#/components/schemas/UserResponse'
+        joined_at:
+          type: string
+          format: date-time
+          title: Joined At
+      type: object
+      required:
+      - user
+      - joined_at
+      title: RoomMemberResponse
+    RoomResponse:
+      properties:
+        id:
+          type: integer
+          title: Id
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        owner:
+          anyOf:
+          - $ref: '#/components/schemas/UserResponse'
+          - type: 'null'
+        is_system:
+          type: boolean
+          title: Is System
+        members:
+          items:
+            $ref: '#/components/schemas/RoomMemberResponse'
+          type: array
+          title: Members
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+        updated_at:
+          type: string
+          format: date-time
+          title: Updated At
+      type: object
+      required:
+      - id
+      - name
+      - owner
+      - is_system
+      - members
+      - created_at
+      - updated_at
+      title: RoomResponse
     Token:
       properties:
         access_token:

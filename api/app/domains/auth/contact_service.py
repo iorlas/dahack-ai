@@ -36,7 +36,7 @@ class ContactService:
         ).first()
 
         if existing_invitation:
-            if existing_invitation.from_user_id == from_user.id:
+            if existing_invitation.from_user.id == from_user.id:
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST, detail="Invitation already sent"
                 )
@@ -83,7 +83,7 @@ class ContactService:
         logger.info(
             "contact_invitation_accepted",
             invitation_id=invitation_id,
-            from_user_id=invitation.from_user_id,
+            from_user_id=invitation.from_user.id,
             to_user_id=user.id,
         )
 
@@ -106,8 +106,8 @@ class ContactService:
         logger.info(
             "contact_invitation_rejected",
             invitation_id=invitation_id,
-            from_user_id=invitation.from_user_id,
-            to_user_id=invitation.to_user_id,
+            from_user_id=invitation.from_user.id,
+            to_user_id=invitation.to_user.id,
         )
 
     @staticmethod
@@ -131,7 +131,7 @@ class ContactService:
         # Transform contacts to include "other_user" for easier frontend handling
         contacts = []
         for contact in contacts_raw:
-            other_user = contact.user2 if contact.user1_id == user.id else contact.user1
+            other_user = contact.user2 if contact.user1.id == user.id else contact.user1
             contacts.append(
                 {
                     "id": contact.id,
@@ -176,8 +176,11 @@ class ContactService:
             return contact
         except IntegrityError:
             # Contact already exists (shouldn't happen, but handle gracefully)
-            contact = await Contact.filter(user1=user1, user2=user2).first()
-            return contact
+            existing_contact = await Contact.filter(user1=user1, user2=user2).first()
+            if existing_contact:
+                return existing_contact
+            # If we still can't find it, re-raise the error
+            raise
 
 
 contact_service = ContactService()

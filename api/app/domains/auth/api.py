@@ -1,3 +1,5 @@
+from typing import Annotated
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from structlog import get_logger
 
@@ -52,6 +54,6 @@ async def login(user_data: UserLogin) -> dict:
 
 
 @router.get("/me", response_model=UserResponse)
-async def get_current_user(current_user: User = Depends(get_current_active_user)) -> User:
+async def get_current_user(current_user: Annotated[User, Depends(get_current_active_user)]) -> User:
     """Get current authenticated user."""
     return current_user
