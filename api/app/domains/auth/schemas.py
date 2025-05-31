@@ -31,9 +31,9 @@ class TokenData(BaseModel):
 
 
 class UserResponse(BaseModel):
-
     class Config:
         from_attributes = True
+
     id: int
     username: str
     is_active: bool
@@ -46,9 +46,9 @@ class ContactInvite(BaseModel):
 
 
 class InvitationResponse(BaseModel):
-
     class Config:
         from_attributes = True
+
     id: int
     from_user: UserResponse
     to_user: UserResponse
@@ -57,9 +57,9 @@ class InvitationResponse(BaseModel):
 
 
 class ContactResponse(BaseModel):
-
     class Config:
         from_attributes = True
+
     id: int
     other_user: UserResponse  # Will be populated with the other user in the contact
     created_at: datetime
