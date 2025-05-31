@@ -1,2 +1,0 @@
-- Cursor hangs sometimes opening some rules
-- Cursor hangs sometimes
