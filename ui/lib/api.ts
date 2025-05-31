@@ -57,7 +57,6 @@ export interface RegisterRequest {
 export interface AuthResponse {
   access_token: string;
   token_type: string;
-  user: User;
 }
 
 // Enhanced error handling
@@ -68,8 +67,17 @@ const handleApiError = async (response: Response) => {
     throw new Error(`Validation error: ${errorMessage}`);
   }
 
-  const errorText = await response.text();
-  throw new Error(`API error (${response.status}): ${errorText || response.statusText}`);
+  try {
+    // Try to parse JSON error response for 400, 401, etc.
+    const errorData = await response.json();
+    if (errorData.detail) {
+      throw new Error(`API error (${response.status}): ${errorData.detail}`);
+    }
+    throw new Error(`API error (${response.status}): ${JSON.stringify(errorData)}`);
+  } catch {
+    // If JSON parsing fails, fall back to status text
+    throw new Error(`API error (${response.status}): ${response.statusText}`);
+  }
 };
 
 // Get auth headers
@@ -264,7 +272,6 @@ export const useLogin = () => {
     mutationFn: authApi.login,
     onSuccess: (data) => {
       localStorage.setItem('access_token', data.access_token);
-      localStorage.setItem('username', data.user.username);
     },
   });
 };

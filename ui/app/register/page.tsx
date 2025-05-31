@@ -70,11 +70,24 @@ export default function RegisterPage() {
       // Redirect to login page after successful registration
       setTimeout(() => {
         router.push('/login');
-      }, 1000);
+      }, 100);
     } catch (err) {
       if (err instanceof Error) {
-        if (err.message.includes('Validation error')) {
-          setError(err.message.replace('Validation error: ', ''));
+        const errorMessage = err.message;
+
+        // Handle specific backend error messages
+        if (errorMessage.includes('Username already registered')) {
+          setError('Username already exists');
+        } else if (errorMessage.includes('Validation error')) {
+          // Handle validation errors from backend (e.g., special characters)
+          const cleanMessage = errorMessage.replace('Validation error: ', '');
+          if (cleanMessage.includes('Username must contain only alphanumeric characters')) {
+            setError('Invalid characters in username. Only letters and numbers are allowed.');
+          } else {
+            setError(cleanMessage);
+          }
+        } else if (errorMessage.includes('400')) {
+          setError('Username already exists');
         } else {
           setError('Registration failed. Please try again.');
         }
@@ -101,7 +114,7 @@ export default function RegisterPage() {
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="rounded-md shadow-sm -space-y-px">
             <div>
-              <label htmlFor="username" className="sr-only">
+              <label htmlFor="username" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Username
               </label>
               <input
@@ -115,7 +128,7 @@ export default function RegisterPage() {
               />
             </div>
             <div>
-              <label htmlFor="password" className="sr-only">
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Password
               </label>
               <input
@@ -129,7 +142,10 @@ export default function RegisterPage() {
               />
             </div>
             <div>
-              <label htmlFor="confirmPassword" className="sr-only">
+              <label
+                htmlFor="confirmPassword"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+              >
                 Confirm Password
               </label>
               <input

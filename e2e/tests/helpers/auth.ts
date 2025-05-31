@@ -28,9 +28,30 @@ export class AuthHelper {
      * Fill registration form
      */
     async fillRegistrationForm(credentials: UserCredentials): Promise<void> {
-        await this.page.getByLabel(/username/i).fill(credentials.username);
-        await this.page.getByLabel(/^password/i).fill(credentials.password);
-        await this.page.getByLabel(/confirm password|repeat password/i).fill(credentials.password);
+        // Wait for form fields to be ready and fill them with click/clear approach
+        await this.page.locator('#username').waitFor({ state: 'visible' });
+        await this.page.locator('#username').click();
+        await this.page.locator('#username').clear();
+        await this.page.locator('#username').fill(credentials.username);
+
+        await this.page.locator('#password').click();
+        await this.page.locator('#password').clear();
+        await this.page.locator('#password').fill(credentials.password);
+
+        await this.page.locator('#confirmPassword').click();
+        await this.page.locator('#confirmPassword').clear();
+        await this.page.locator('#confirmPassword').fill(credentials.password);
+
+        // Verify values are set correctly
+        const usernameValue = await this.page.locator('#username').inputValue();
+        const passwordValue = await this.page.locator('#password').inputValue();
+        const confirmPasswordValue = await this.page.locator('#confirmPassword').inputValue();
+
+        if (usernameValue !== credentials.username ||
+            passwordValue !== credentials.password ||
+            confirmPasswordValue !== credentials.password) {
+            throw new Error(`Form values not set correctly. Expected: ${JSON.stringify(credentials)}, Got: {username: "${usernameValue}", password: "${passwordValue}", confirmPassword: "${confirmPasswordValue}"}`);
+        }
     }
 
     /**
@@ -44,8 +65,23 @@ export class AuthHelper {
      * Fill login form
      */
     async fillLoginForm(credentials: UserCredentials): Promise<void> {
-        await this.page.getByLabel(/username/i).fill(credentials.username);
-        await this.page.getByLabel(/password/i).fill(credentials.password);
+        // Wait for username field to be ready and click it to focus
+        await this.page.locator('#username').waitFor({ state: 'visible' });
+        await this.page.locator('#username').click();
+        await this.page.locator('#username').clear();
+        await this.page.locator('#username').fill(credentials.username);
+
+        await this.page.locator('#password').click();
+        await this.page.locator('#password').clear();
+        await this.page.locator('#password').fill(credentials.password);
+
+        // Verify values are set correctly
+        const usernameValue = await this.page.locator('#username').inputValue();
+        const passwordValue = await this.page.locator('#password').inputValue();
+
+        if (usernameValue !== credentials.username || passwordValue !== credentials.password) {
+            throw new Error(`Login form values not set correctly. Expected: ${JSON.stringify(credentials)}, Got: {username: "${usernameValue}", password: "${passwordValue}"}`);
+        }
     }
 
     /**
@@ -80,7 +116,7 @@ export class AuthHelper {
         const timestamp = Date.now();
         const random = Math.floor(Math.random() * 1000);
         return {
-            username: `${prefix}_${timestamp}_${random}`,
+            username: `${prefix}${timestamp}${random}`,
             password: 'SecureTestPassword123!',
         };
     }
