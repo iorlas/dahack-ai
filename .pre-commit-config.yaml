@@ -51,12 +51,12 @@ repos:
 
   - repo: local
     hooks:
-      # - id: api-generate-openapi-spec
-      #   name: "📜 API: Generate OpenAPI Spec"
-      #   entry: sh -c 'just -f common/python/justfile --working-directory api openapi-generate cwb_api'
-      #   language: system
-      #   pass_filenames: false
-      #   files: api/
+      - id: api-generate-openapi-spec
+        name: "📜 API: Generate OpenAPI Spec"
+        entry: sh -c 'cd api && source .venv/bin/activate && python -m app.generate_openapi'
+        language: system
+        pass_filenames: false
+        files: api/app/
       - id: pyright
         name: "🔍 Pyright Type Check"
         entry: sh -c 'cd api && uv run pyright'
