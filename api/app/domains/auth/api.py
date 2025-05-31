@@ -1,3 +1,5 @@
+from typing import Annotated
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from structlog import get_logger
 
@@ -26,10 +28,10 @@ async def register(user_data: UserRegister) -> User:
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Username already registered",
         )
-    
+
     # Create new user
     user = await auth_service.create_user(username=user_data.username, password=user_data.password)
-    
+
     logger.info("user_registered", username=user.username, user_id=user.id)
     return user
 
@@ -44,14 +46,14 @@ async def login(user_data: UserLogin) -> dict:
             detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    
+
     access_token = auth_service.create_access_token(data={"sub": user.username})
-    
+
     logger.info("user_logged_in", username=user.username, user_id=user.id)
     return {"access_token": access_token, "token_type": "bearer"}
 
 
 @router.get("/me", response_model=UserResponse)
-async def get_current_user(current_user: User = Depends(get_current_active_user)) -> User:
+async def get_current_user(current_user: Annotated[User, Depends(get_current_active_user)]) -> User:
     """Get current authenticated user."""
     return current_user

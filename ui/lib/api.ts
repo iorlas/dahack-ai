@@ -59,6 +59,36 @@ export interface AuthResponse {
   token_type: string;
 }
 
+// Contact interfaces
+export interface ContactInvite {
+  username: string;
+}
+
+export interface InvitationResponse {
+  id: number;
+  from_user: User;
+  to_user: User;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ContactResponse {
+  id: number;
+  other_user: User;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ContactListResponse {
+  sent_invitations: InvitationResponse[];
+  received_invitations: InvitationResponse[];
+  contacts: ContactResponse[];
+}
+
+export interface MutualContactCheck {
+  is_mutual_contact: boolean;
+}
+
 // Enhanced error handling
 const handleApiError = async (response: Response) => {
   if (response.status === 422) {
@@ -82,6 +112,7 @@ const handleApiError = async (response: Response) => {
 
 // Get auth headers
 const getAuthHeaders = (): Record<string, string> => {
+  if (typeof window === 'undefined') return {};
   const token = localStorage.getItem('access_token');
   return token ? { Authorization: `Bearer ${token}` } : {};
 };
@@ -212,6 +243,76 @@ export const authApi = {
   },
 };
 
+// Contact API functions
+export const contactApi = {
+  sendInvitation: async (invite: ContactInvite) => {
+    const response = await fetch(`${API_URL}/v1/contacts/invite`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...getAuthHeaders(),
+      },
+      body: JSON.stringify(invite),
+    });
+
+    if (response.status !== 200) {
+      await handleApiError(response);
+    }
+
+    return response.json() as Promise<InvitationResponse>;
+  },
+
+  acceptInvitation: async (invitationId: number) => {
+    const response = await fetch(`${API_URL}/v1/contacts/${invitationId}/accept`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+    });
+
+    if (response.status !== 200) {
+      await handleApiError(response);
+    }
+
+    return response.json() as Promise<ContactResponse>;
+  },
+
+  rejectInvitation: async (invitationId: number) => {
+    const response = await fetch(`${API_URL}/v1/contacts/${invitationId}/reject`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+    });
+
+    if (response.status !== 204) {
+      await handleApiError(response);
+    }
+
+    // 204 No Content - no response body expected
+  },
+
+  getContacts: async () => {
+    const response = await fetch(`${API_URL}/v1/contacts`, {
+      headers: getAuthHeaders(),
+    });
+
+    if (response.status !== 200) {
+      await handleApiError(response);
+    }
+
+    return response.json() as Promise<ContactListResponse>;
+  },
+
+  checkMutualContact: async (username: string) => {
+    const response = await fetch(`${API_URL}/v1/contacts/check/${username}`, {
+      headers: getAuthHeaders(),
+    });
+
+    if (response.status !== 200) {
+      await handleApiError(response);
+    }
+
+    return response.json() as Promise<MutualContactCheck>;
+  },
+};
+
 // React Query hooks
 export const useTodos = (params?: {
   completed?: boolean;
@@ -286,6 +387,56 @@ export const useCurrentUser = () => {
   return useQuery({
     queryKey: ['currentUser'],
     queryFn: authApi.getCurrentUser,
-    enabled: !!localStorage.getItem('access_token'),
+    enabled: typeof window !== 'undefined' && !!localStorage.getItem('access_token'),
+  });
+};
+
+// Contact hooks
+export const useContacts = () => {
+  return useQuery({
+    queryKey: ['contacts'],
+    queryFn: contactApi.getContacts,
+    enabled: typeof window !== 'undefined' && !!localStorage.getItem('access_token'),
+  });
+};
+
+export const useSendInvitation = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: contactApi.sendInvitation,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['contacts'] });
+    },
+  });
+};
+
+export const useAcceptInvitation = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: contactApi.acceptInvitation,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['contacts'] });
+    },
+  });
+};
+
+export const useRejectInvitation = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: contactApi.rejectInvitation,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['contacts'] });
+    },
+  });
+};
+
+export const useMutualContactCheck = (username: string) => {
+  return useQuery({
+    queryKey: ['mutualContact', username],
+    queryFn: () => contactApi.checkMutualContact(username),
+    enabled: !!username && typeof window !== 'undefined' && !!localStorage.getItem('access_token'),
   });
 };

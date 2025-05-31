@@ -4,7 +4,7 @@ from app.core.models import BaseModel
 
 
 class User(BaseModel):
-    class Meta:
+    class Meta(BaseModel.Meta):
         table = "users"
 
     username = fields.CharField(max_length=50, unique=True, index=True)
@@ -16,7 +16,7 @@ class User(BaseModel):
 
 
 class Invitation(BaseModel):
-    class Meta:
+    class Meta(BaseModel.Meta):
         table = "invitations"
         unique_together = (("from_user", "to_user"),)
 
@@ -28,7 +28,7 @@ class Invitation(BaseModel):
 
 
 class Contact(BaseModel):
-    class Meta:
+    class Meta(BaseModel.Meta):
         table = "contacts"
         unique_together = (("user1", "user2"),)
 

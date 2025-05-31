@@ -2,11 +2,14 @@
 
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import type { ContactResponse } from '../../lib/api';
 import { useCurrentUser } from '../../lib/api';
+import ContactList from './components/ContactList';
 
 export default function ChatPage() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
+  const [selectedContact, setSelectedContact] = useState<ContactResponse | null>(null);
 
   const router = useRouter();
   const { data: user, isLoading: userLoading, error: userError } = useCurrentUser();
@@ -38,6 +41,10 @@ export default function ChatPage() {
     localStorage.removeItem('username');
     localStorage.removeItem('access_token');
     router.push('/');
+  };
+
+  const handleContactSelect = (contact: ContactResponse) => {
+    setSelectedContact(contact);
   };
 
   if (loading || userLoading) {
@@ -76,48 +83,66 @@ export default function ChatPage() {
         </div>
       </nav>
 
-      <div className="flex h-screen">
-        {/* Sidebar */}
+      <div className="flex h-[calc(100vh-4rem)]">
+        {/* Sidebar with Contact List */}
         <div
-          className="w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700"
+          className="w-80 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700"
           data-testid="chat-sidebar"
         >
-          <div className="p-4">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Chats</h2>
-            <div className="space-y-2" data-testid="chat-list">
-              <div className="p-2 rounded-lg bg-gray-100 dark:bg-gray-700">
-                <p className="text-sm font-medium text-gray-900 dark:text-white">General</p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">Welcome to the chat!</p>
-              </div>
-            </div>
-          </div>
+          <ContactList onContactSelect={handleContactSelect} />
         </div>
 
         {/* Main chat area */}
         <div className="flex-1 flex flex-col" data-testid="chat-interface">
           <div className="flex-1 p-4" data-testid="message-area">
-            <div className="text-center text-gray-500 dark:text-gray-400">
-              <h3 className="text-lg font-medium mb-2">Welcome to DAHack AI Chat!</h3>
-              <p>Welcome {user?.username || 'User'}! Start chatting with your team.</p>
-            </div>
+            {selectedContact ? (
+              <div className="h-full flex flex-col">
+                {/* Chat header */}
+                <div className="border-b border-gray-200 dark:border-gray-700 pb-4 mb-4">
+                  <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+                    Chat with {selectedContact.other_user.username}
+                  </h3>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    Contact since {new Date(selectedContact.created_at).toLocaleDateString()}
+                  </p>
+                </div>
+
+                {/* Messages area */}
+                <div className="flex-1 flex items-center justify-center">
+                  <div className="text-center text-gray-500 dark:text-gray-400">
+                    <p>Start a conversation with {selectedContact.other_user.username}</p>
+                    <p className="text-sm mt-2">Messages will appear here</p>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="text-center text-gray-500 dark:text-gray-400 h-full flex items-center justify-center">
+                <div>
+                  <h3 className="text-lg font-medium mb-2">Welcome to DAHack AI Chat!</h3>
+                  <p>Welcome {user?.username || 'User'}! Select a contact to start chatting.</p>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Message input */}
-          <div className="border-t border-gray-200 dark:border-gray-700 p-4">
-            <div className="flex space-x-2">
-              <input
-                type="text"
-                placeholder="Type a message..."
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-              />
-              <button
-                type="button"
-                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium"
-              >
-                Send
-              </button>
+          {selectedContact && (
+            <div className="border-t border-gray-200 dark:border-gray-700 p-4">
+              <div className="flex space-x-2">
+                <input
+                  type="text"
+                  placeholder={`Type a message to ${selectedContact.other_user.username}...`}
+                  className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                />
+                <button
+                  type="button"
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium"
+                >
+                  Send
+                </button>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </div>

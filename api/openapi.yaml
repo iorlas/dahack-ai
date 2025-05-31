@@ -238,8 +238,192 @@ paths:
                 $ref: '#/components/schemas/UserResponse'
       security:
       - HTTPBearer: []
+  /v1/contacts/invite:
+    post:
+      tags:
+      - contacts
+      summary: Send Contact Invitation
+      description: Send a contact invitation to another user.
+      operationId: send_contact_invitation_v1_contacts_invite_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContactInvite'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvitationResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+      - HTTPBearer: []
+  /v1/contacts/{invitation_id}/accept:
+    post:
+      tags:
+      - contacts
+      summary: Accept Contact Invitation
+      description: Accept a contact invitation.
+      operationId: accept_contact_invitation_v1_contacts__invitation_id__accept_post
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: invitation_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Invitation Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContactResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /v1/contacts/{invitation_id}/reject:
+    post:
+      tags:
+      - contacts
+      summary: Reject Contact Invitation
+      description: Reject a contact invitation.
+      operationId: reject_contact_invitation_v1_contacts__invitation_id__reject_post
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: invitation_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Invitation Id
+      responses:
+        '204':
+          description: Successful Response
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /v1/contacts:
+    get:
+      tags:
+      - contacts
+      summary: Get Contacts
+      description: Get all contacts for the current user.
+      operationId: get_contacts_v1_contacts_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContactListResponse'
+      security:
+      - HTTPBearer: []
+  /v1/contacts/check/{username}:
+    get:
+      tags:
+      - contacts
+      summary: Check Mutual Contact
+      description: Check if the current user and specified user are mutual contacts.
+      operationId: check_mutual_contact_v1_contacts_check__username__get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: username
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Username
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+                title: Response Check Mutual Contact V1 Contacts Check  Username  Get
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
 components:
   schemas:
+    ContactInvite:
+      properties:
+        username:
+          type: string
+          title: Username
+          description: Username of the user to invite
+      type: object
+      required:
+      - username
+      title: ContactInvite
+    ContactListResponse:
+      properties:
+        sent_invitations:
+          items:
+            $ref: '#/components/schemas/InvitationResponse'
+          type: array
+          title: Sent Invitations
+        received_invitations:
+          items:
+            $ref: '#/components/schemas/InvitationResponse'
+          type: array
+          title: Received Invitations
+        contacts:
+          items:
+            $ref: '#/components/schemas/ContactResponse'
+          type: array
+          title: Contacts
+      type: object
+      required:
+      - sent_invitations
+      - received_invitations
+      - contacts
+      title: ContactListResponse
+    ContactResponse:
+      properties:
+        id:
+          type: integer
+          title: Id
+        other_user:
+          $ref: '#/components/schemas/UserResponse'
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+        updated_at:
+          type: string
+          format: date-time
+          title: Updated At
+      type: object
+      required:
+      - id
+      - other_user
+      - created_at
+      - updated_at
+      title: ContactResponse
     HTTPValidationError:
       properties:
         detail:
@@ -249,6 +433,31 @@ components:
           title: Detail
       type: object
       title: HTTPValidationError
+    InvitationResponse:
+      properties:
+        id:
+          type: integer
+          title: Id
+        from_user:
+          $ref: '#/components/schemas/UserResponse'
+        to_user:
+          $ref: '#/components/schemas/UserResponse'
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+        updated_at:
+          type: string
+          format: date-time
+          title: Updated At
+      type: object
+      required:
+      - id
+      - from_user
+      - to_user
+      - created_at
+      - updated_at
+      title: InvitationResponse
     Todo:
       properties:
         title:
