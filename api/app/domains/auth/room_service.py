@@ -10,7 +10,7 @@ logger = get_logger()
 
 class RoomService:
     @staticmethod
-    async def create_user_room(owner: User, name: str, member_usernames: list[str] = None) -> Room:
+    async def create_user_room(owner: User, name: str, member_usernames: list[str] | None = None) -> Room:
         """Create a user-owned room."""
         # Create the room
         room = await Room.create(name=name, owner=owner, is_system=False)

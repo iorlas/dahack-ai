@@ -57,10 +57,10 @@ class ContactService:
             invitation = await Invitation.create(from_user=from_user, to_user=to_user)
             logger.info("contact_invitation_sent", from_user_id=from_user.id, to_user_id=to_user.id)
             return invitation
-        except IntegrityError:
+        except IntegrityError as e:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST, detail="Contact invitation already exists"
-            )
+            ) from e
 
     @staticmethod
     async def accept_invitation(user: User, invitation_id: int) -> Contact:

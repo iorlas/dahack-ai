@@ -17,17 +17,17 @@ class RoomAddMembers(BaseModel):
 
 
 class RoomMemberResponse(BaseModel):
-
     class Config:
         from_attributes = True
+
     user: UserResponse
     joined_at: datetime
 
 
 class RoomResponse(BaseModel):
-
     class Config:
         from_attributes = True
+
     id: int
     name: str | None
     owner: UserResponse | None

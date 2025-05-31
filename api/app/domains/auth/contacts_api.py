@@ -33,10 +33,10 @@ async def accept_contact_invitation(
     """Accept a contact invitation."""
     contact = await contact_service.accept_invitation(current_user, invitation_id)
     await contact.fetch_related("user1", "user2")
-    
+
     # Determine the other user for the response
     other_user = contact.user2 if contact.user1_id == current_user.id else contact.user1
-    
+
     return {
         "id": contact.id,
         "other_user": other_user,
@@ -67,6 +67,6 @@ async def check_mutual_contact(
     other_user = await User.filter(username=username).first()
     if not other_user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
-    
+
     is_mutual = await contact_service.check_mutual_contact(current_user, other_user)
-    return {"is_mutual_contact": is_mutual, "username": username} 
+    return {"is_mutual_contact": is_mutual, "username": username}
