@@ -34,7 +34,7 @@ class RedisService:
     @classmethod
     async def close_async_redis(cls):
         if cls._async_redis is not None:
-            await cls._async_redis.close()
+            await cls._async_redis.aclose()
             cls._async_redis = None
             logger.info("async_redis_disconnected")
 

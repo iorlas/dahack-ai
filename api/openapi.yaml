@@ -5,7 +5,10 @@ info:
 paths:
   /v1/healthz:
     get:
+      tags:
+      - health
       summary: Health Check
+      description: Health check endpoint.
       operationId: health_check_v1_healthz_get
       responses:
         '200':

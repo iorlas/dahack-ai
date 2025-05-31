@@ -13,6 +13,23 @@ from app.domains.todos.api import router as todos_router
 logger = get_logger()
 
 
+async def startup_event():
+    # Initialize Redis
+    redis_service.get_redis()
+    await redis_service.get_async_redis()
+    logger.info("redis_initialized")
+
+    # Initialize S3
+    await s3_service.get_session()
+    logger.info("s3_initialized")
+
+
+async def shutdown_event():
+    # Close Redis connection
+    await redis_service.close_async_redis()
+    logger.info("redis_connection_closed")
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     from app.core.db import close_db, init_db
@@ -24,12 +41,7 @@ async def lifespan(app: FastAPI):
     await shutdown_event()
 
 
-app = FastAPI(
-    title=settings.PROJECT_NAME,
-    version=settings.VERSION,
-    lifespan=lifespan,
-    openapi_url=f"{settings.API_V1_STR}/openapi.json",
-)
+app = FastAPI(title=settings.PROJECT_NAME, version=settings.VERSION, lifespan=lifespan)
 
 # Set all CORS enabled origins
 app.add_middleware(
@@ -43,27 +55,3 @@ app.add_middleware(
 # Include domain routers
 app.include_router(health_router, prefix="/v1")
 app.include_router(todos_router, prefix="/v1")
-
-
-@app.on_event("startup")
-async def startup_event():
-    # Initialize Redis
-    redis_service.get_redis()
-    await redis_service.get_async_redis()
-    logger.info("redis_initialized")
-
-    # Initialize S3
-    await s3_service.get_session()
-    logger.info("s3_initialized")
-
-
-@app.on_event("shutdown")
-async def shutdown_event():
-    # Close Redis connection
-    await redis_service.close_async_redis()
-    logger.info("redis_connection_closed")
-
-
-@app.get("/v1/healthz")
-async def health_check():
-    return {"status": "healthy"}
