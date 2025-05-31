@@ -18,6 +18,11 @@ WORKDIR /app
 COPY pyproject.toml uv.lock ./
 RUN uv sync --locked
 
+# Migration stage
+FROM base AS migration
+COPY . .
+CMD ["uv", "run", "python", "run_migrations.py"]
+
 # Development stage
 FROM base AS development
 COPY . .
