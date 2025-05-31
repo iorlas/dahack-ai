@@ -4,7 +4,9 @@ JWT-based authentication system with bcrypt password hashing.
 
 ## Endpoints
 
-### 1. Register User
+### Authentication
+
+#### 1. Register User
 ```
 POST /v1/auth/register
 Content-Type: application/json
@@ -24,7 +26,7 @@ Response: 201 Created
 }
 ```
 
-### 2. Login
+#### 2. Login
 ```
 POST /v1/auth/login
 Content-Type: application/json
@@ -41,7 +43,7 @@ Response: 200 OK
 }
 ```
 
-### 3. Get Current User
+#### 3. Get Current User
 ```
 GET /v1/auth/me
 Authorization: Bearer <token>
@@ -56,12 +58,86 @@ Response: 200 OK
 }
 ```
 
+### Contacts
+
+#### 4. Send Contact Invitation
+```
+POST /v1/auth/contacts/invite
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "username": "string"  // Username to invite
+}
+
+Response: 200 OK
+{
+  "id": 1,
+  "from_user": { /* user object */ },
+  "to_user": { /* user object */ },
+  "status": "invited",
+  "created_at": "2024-01-01T00:00:00",
+  "updated_at": "2024-01-01T00:00:00"
+}
+```
+
+#### 5. Accept Contact Invitation
+```
+POST /v1/auth/contacts/{invitation_id}/accept
+Authorization: Bearer <token>
+
+Response: 200 OK
+{
+  "id": 1,
+  "other_user": { /* user object */ },
+  "created_at": "2024-01-01T00:00:00",
+  "updated_at": "2024-01-01T00:00:00"
+}
+```
+
+#### 6. Reject Contact Invitation
+```
+DELETE /v1/auth/contacts/{invitation_id}/reject
+Authorization: Bearer <token>
+
+Response: 204 No Content
+```
+
+#### 7. Get Contacts
+```
+GET /v1/auth/contacts
+Authorization: Bearer <token>
+
+Response: 200 OK
+{
+  "sent_invitations": [
+    { /* contact objects with status="invited" */ }
+  ],
+  "received_invitations": [
+    { /* contact objects with status="invited" */ }
+  ],
+  "contacts": [
+    { /* contact objects with status="accepted" */ }
+  ]
+}
+```
+
+## Contact Flow
+
+1. User A sends invitation to User B
+2. User B sees the invitation in `received_invitations`
+3. User B accepts or rejects the invitation
+4. If accepted, both users see each other in `contacts`
+5. If User B had already invited User A, the invitation auto-accepts
+
 ## Security Features
 
 - Passwords salted and hashed with bcrypt
 - JWT tokens with configurable expiration (default: 8 days)
 - Username validation (alphanumeric only)
 - Password minimum length: 8 characters
+- Contact invitations require authentication
+- Users cannot add themselves as contacts
 
 ## Usage Example
 
@@ -76,14 +152,21 @@ response = httpx.post(
 
 # Login
 response = httpx.post(
-    "http://localhost:8000/v1/auth/login", 
+    "http://localhost:8000/v1/auth/login",
     json={"username": "testuser", "password": "securepass123"}
 )
 token = response.json()["access_token"]
 
-# Use protected endpoint
+# Send contact invitation
+response = httpx.post(
+    "http://localhost:8000/v1/auth/contacts/invite",
+    json={"username": "otheruser"},
+    headers={"Authorization": f"Bearer {token}"}
+)
+
+# Get contacts
 response = httpx.get(
-    "http://localhost:8000/v1/auth/me",
+    "http://localhost:8000/v1/auth/contacts",
     headers={"Authorization": f"Bearer {token}"}
 )
 ```
@@ -106,4 +189,4 @@ python run_migrations.py
 aerich init-db  # First time only
 aerich migrate --name add_users_table
 aerich upgrade
-``` 
+```
