@@ -1,0 +1,17 @@
+---
+description:
+globs:
+alwaysApply: true
+---
+# Structure
+
+/ui - NextJS UI Frontend
+/api - FastAPI API Backend
+/infra - Inrastructure IaC w/ Terraform
+/e2e - Playwright E2E tests
+
+# QA
+
+## SAST
+
+use `uvx pre-commit` at / (root of the repository/workspace) to run linters to verify the changes

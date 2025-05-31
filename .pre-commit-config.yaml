@@ -1,0 +1,71 @@
+default_install_hook_types:
+  - pre-commit
+  - commit-msg
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v3.2.0
+    hooks:
+      - id: trailing-whitespace
+        exclude: .tsx.snap # We need to guarantee that ui snapshots are immutable
+      - id: end-of-file-fixer
+        exclude: .tsx.snap # We need to guarantee that ui snapshots are immutable
+      - id: check-yaml
+      - id: check-toml
+      - id: check-json
+      - id: check-added-large-files
+      - id: check-merge-conflict
+      - id: detect-private-key
+
+  - repo: https://github.com/compilerla/conventional-pre-commit
+    rev: v4.0.0
+    hooks:
+      - id: conventional-pre-commit
+        name: "🔖 Conventional Commit Msg"
+        stages: [commit-msg]
+        args: []
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: "v0.11.2"
+    hooks:
+      - id: ruff
+        name: "🧹 Ruff (fix)"
+        args: [--fix]
+      - id: ruff-format
+        name: "🧼 Ruff Format"
+
+  - repo: https://github.com/PyCQA/bandit
+    rev: "1.7.8"
+    hooks:
+      - id: bandit
+        name: "🚨 Bandit Security Check"
+        args: ["-x", ".env,api/.venv,api/test", "-r"]
+        language_version: python3.12
+
+  - repo: https://github.com/bwhmather/ssort
+    rev: 0.12.4
+    hooks:
+      - id: ssort
+        name: "🔀 SSort Code Sorter"
+        language_version: python3.12
+
+  - repo: local
+    hooks:
+      - id: api-generate-openapi-spec
+        name: "📜 API: Generate OpenAPI Spec"
+        entry: sh -c 'cd api && source .venv/bin/activate && python -m app.generate_openapi'
+        language: system
+        pass_filenames: false
+        files: api/app/
+      - id: pyright
+        name: "🔍 Pyright Type Check"
+        entry: sh -c 'cd api && uv run pyright'
+        language: system
+        types: [file]
+        files: ^api/
+      - id: biome-check
+        name: "🌳 Biome Check"
+        entry: sh -c 'cd ui && npx @biomejs/biome check --apply .'
+        language: system
+        types: [file]
+        files: \.(js|ts|jsx|tsx|json)$

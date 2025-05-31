@@ -1,0 +1,95 @@
+{
+	"folders": [
+		{
+			"name": "Repository",
+			"path": "."
+		},
+		{
+			"name": "UI",
+			"path": "ui"
+		},
+		{
+			"name": "API",
+			"path": "api",
+			"settings": {
+				"python.defaultInterpreterPath": "./cdk/.venv/bin/python"
+			}
+		},
+		{
+			"name": "Infra",
+			"path": "infra"
+		},
+		{
+			"name": "E2E",
+			"path": "e2e"
+		}
+	],
+	"settings": {
+		"[python]": {
+			"editor.defaultFormatter": "charliermarsh.ruff"
+		},
+		"editor.codeActionsOnSave": {
+			"source.fixAll": "explicit",
+			"source.organizeImports": "always"
+		},
+		"editor.cursorBlinking": "smooth",
+		"editor.fontFamily": "'JetBrainsMono Nerd Font', 'Droid Sans Mono', 'monospace', monospace",
+		"editor.fontLigatures": true,
+		"editor.formatOnSave": true,
+		"editor.minimap.renderCharacters": false,
+		"editor.minimap.size": "fill",
+		"editor.rulers": [
+			100,
+			120
+		],
+		"explorer.confirmDragAndDrop": false,
+		"explorer.sortOrder": "type",
+		"files.autoSave": "afterDelay",
+		"files.exclude": {
+			// Python
+			"**/__pycache__": true,
+			"**/.coverage": true,
+			"**/.mypy_cache": true,
+			"**/.next": true,
+			"**/.pytest_cache": true,
+			"**/.ruff_cache": true,
+			"**/.tox": true,
+			"**/.venv": true,
+			"**/*.pyc": true,
+			"**/*.pyd": true,
+			"**/*.pyo": true,
+			// Typescript
+			"**/node_modules": true
+		},
+		"git.allowForcePush": true,
+		"git.allowNoVerifyCommit": true,
+		"git.autofetch": true,
+		"git.confirmSync": false,
+		"git.postCommitCommand": "push",
+		"terminal.integrated.fontSize": 12,
+		"workbench.colorTheme": "GitHub Dark",
+		"workbench.settings.editor": "json",
+		"workbench.tree.indent": 18,
+	},
+	"extensions": {
+		"recommendations": [
+			"charliermarsh.ruff",
+			"gruntfuggly.todo-tree",
+			"nefrob.vscode-just-syntax",
+			"mechatroner.rainbow-csv",
+			"kevinrose.vsc-python-indent",
+			"ms-python.debugpy",
+			"ms-python.python",
+			"adamviola.parquet-explorer",
+			"donjayamanne.githistory",
+			"tamasfe.even-better-toml",
+			"njpwerner.autodocstring",
+			"mhutchie.git-graph",
+			"humao.rest-client",
+			"github.github-vscode-theme",
+			"biomejs.biome",
+			"ms-azuretools.vscode-docker",
+			"ms-playwright.playwright"
+		]
+	},
+}
