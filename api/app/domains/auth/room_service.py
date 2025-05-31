@@ -2,7 +2,6 @@ from fastapi import HTTPException, status
 from structlog import get_logger
 from tortoise.exceptions import IntegrityError
 
-from app.domains.auth.contact_service import contact_service
 from app.domains.auth.models import Room, RoomMember, User
 
 logger = get_logger()
@@ -10,7 +9,9 @@ logger = get_logger()
 
 class RoomService:
     @staticmethod
-    async def create_user_room(owner: User, name: str, member_usernames: list[str] = None) -> Room:
+    async def create_user_room(
+        owner: User, name: str, member_usernames: list[str] | None = None
+    ) -> Room:
         """Create a user-owned room."""
         # Create the room
         room = await Room.create(name=name, owner=owner, is_system=False)
@@ -42,7 +43,7 @@ class RoomService:
     async def add_members_to_room(room_id: int, owner: User, usernames: list[str]) -> Room:
         """Add members to a user-owned room (only owner can do this)."""
         # Get the room
-        room = await Room.filter(id=room_id).first()
+        room = await Room.filter(id=room_id).prefetch_related("owner").first()
         if not room:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Room not found")
 
@@ -53,7 +54,7 @@ class RoomService:
             )
 
         # Check if user is the owner
-        if room.owner_id != owner.id:
+        if not room.owner or room.owner.id != owner.id:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN, detail="Only room owner can add members"
             )
@@ -64,6 +65,9 @@ class RoomService:
     @staticmethod
     async def _add_members_to_room(room: Room, adding_user: User, usernames: list[str]) -> None:
         """Internal method to add members to a room."""
+        # Import inside function to avoid circular dependency
+        from app.domains.auth.contact_service import contact_service
+
         for username in usernames:
             # Get the user
             user = await User.filter(username=username).first()
@@ -104,7 +108,7 @@ class RoomService:
 
         # Check if user is a member or owner
         is_member = await RoomMember.filter(room=room, user=user).exists()
-        is_owner = room.owner_id == user.id if room.owner_id else False
+        is_owner = room.owner and room.owner.id == user.id
 
         if not is_member and not is_owner:
             raise HTTPException(
@@ -129,7 +133,7 @@ class RoomService:
     @staticmethod
     async def leave_room(room_id: int, user: User) -> None:
         """Leave a user-owned room."""
-        room = await Room.filter(id=room_id).first()
+        room = await Room.filter(id=room_id).prefetch_related("owner").first()
         if not room:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Room not found")
 
@@ -140,7 +144,7 @@ class RoomService:
             )
 
         # Cannot leave if you're the owner
-        if room.owner_id == user.id:
+        if room.owner and room.owner.id == user.id:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="Owner cannot leave the room. Delete it instead.",
@@ -159,12 +163,12 @@ class RoomService:
     @staticmethod
     async def delete_room(room_id: int, user: User) -> None:
         """Delete a room (only owner can do this)."""
-        room = await Room.filter(id=room_id).first()
+        room = await Room.filter(id=room_id).prefetch_related("owner").first()
         if not room:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Room not found")
 
         # Check if user is the owner
-        if room.owner_id != user.id:
+        if not room.owner or room.owner.id != user.id:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN, detail="Only room owner can delete the room"
             )

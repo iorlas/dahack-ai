@@ -7,7 +7,7 @@ class TimestampMixin:
 
 
 class BaseModel(models.Model, TimestampMixin):
-    class Meta(models.Model.Meta):
+    class Meta:
         abstract = True
 
     id = fields.IntField(primary_key=True)

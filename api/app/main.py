@@ -5,13 +5,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from structlog import get_logger
 
 from app.core.config import settings
+from app.core.db import close_db, init_db
 from app.core.redis import redis_service
 from app.core.s3 import s3_service
 from app.domains.auth.api import router as auth_router
 from app.domains.auth.contacts_api import router as contacts_router
 from app.domains.auth.rooms_api import router as rooms_router
 from app.domains.health.api import router as health_router
-from app.domains.todos.api import router as todos_router
 
 logger = get_logger()
 
@@ -35,8 +35,6 @@ async def shutdown_event():
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    from app.core.db import close_db, init_db
-
     await init_db()
     await startup_event()
     yield
@@ -57,7 +55,6 @@ app.add_middleware(
 
 # Include domain routers
 app.include_router(health_router, prefix="/v1")
-app.include_router(todos_router, prefix="/v1")
 app.include_router(auth_router, prefix="/v1")
 app.include_router(contacts_router, prefix="/v1")
 app.include_router(rooms_router, prefix="/v1")
