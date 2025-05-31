@@ -38,3 +38,28 @@ class Contact(BaseModel):
 
     def __str__(self):
         return f"{self.user1} <-> {self.user2}"
+
+
+class Room(BaseModel):
+    class Meta:
+        table = "rooms"
+
+    name = fields.CharField(max_length=255, null=True)
+    owner = fields.ForeignKeyField("models.User", related_name="owned_rooms", null=True)
+    is_system = fields.BooleanField(default=False)
+
+    def __str__(self):
+        return f"Room({self.id}, system={self.is_system})"
+
+
+class RoomMember(BaseModel):
+    class Meta:
+        table = "room_members"
+        unique_together = (("room", "user"),)
+
+    room = fields.ForeignKeyField("models.Room", related_name="members")
+    user = fields.ForeignKeyField("models.User", related_name="room_memberships")
+    joined_at = fields.DatetimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user} in {self.room}"

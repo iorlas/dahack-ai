@@ -167,6 +167,12 @@ class ContactService:
 
         try:
             contact = await Contact.create(user1=user1, user2=user2)
+
+            # Create system room for the new contacts
+            from app.domains.auth.room_service import room_service
+
+            await room_service.get_or_create_system_room(user1, user2)
+
             return contact
         except IntegrityError:
             # Contact already exists (shouldn't happen, but handle gracefully)
