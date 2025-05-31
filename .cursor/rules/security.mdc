@@ -1,0 +1,100 @@
+---
+description:
+globs:
+alwaysApply: true
+---
+# Security Considerations
+
+## Authentication & Authorization
+
+### User Authentication
+- Implement secure password storage using bcrypt or Argon2 with appropriate salt rounds
+- Enforce strong password policies (minimum length, complexity requirements)
+- Store session tokens securely and implement proper session management
+- Consider implementing JWT with appropriate expiration times
+
+### Authorization
+- Implement proper access control for chat rooms and group chats
+- Ensure users can only access chats they are authorized to view
+- Implement proper role-based access control for group chat owners
+- Validate all user inputs and permissions on both client and server side
+
+## Data Security
+
+### Message Security
+- Implement end-to-end encryption for chat messages
+- Use secure WebSocket connections (WSS) for real-time communication
+- Ensure message persistence with proper encryption at rest
+
+### Media Security
+- Implement proper file type validation
+- Use secure URLs for media access with appropriate expiration
+- Implement proper access control for media files
+
+## Infrastructure Security
+
+### Network Security
+- Use HTTPS for all web traffic
+- Implement proper CORS policies
+- Use secure WebSocket connections
+- Implement rate limiting for API endpoints
+- Use proper firewall rules and security groups
+
+### Database Security
+- Implement proper database access controls
+- Use parameterized queries to prevent SQL injection
+
+### Cloud Security
+- Use secure cloud storage for media files
+- Implement proper IAM roles and permissions
+- Use secure secrets management
+- Use secure container configurations
+
+## Application Security
+
+### Input Validation
+- Implement proper input validation for all user inputs
+- Use parameterized queries for database operations
+- Implement proper output encoding
+- Validate file uploads
+- Implement proper error handling
+
+### API Security
+- Implement proper API authentication
+- Use rate limiting for API endpoints
+- Implement proper API versioning
+- Use secure API endpoints
+- Implement proper API documentation
+
+## Monitoring and Logging
+
+### Security Monitoring
+- Use proper log retention policies
+- Implement proper audit trails
+
+### Performance Monitoring
+- Monitor system performance
+- Monitor resource usage
+- Implement proper scaling policies
+
+## Compliance and Best Practices
+
+### General Security
+- Follow OWASP security guidelines
+- Implement proper security headers
+- Use secure coding practices
+- Implement proper security testing
+- Follow security best practices
+
+## Development Security
+
+### Code Security
+- Use secure coding practices
+- Implement proper testing procedures
+- Implement proper documentation
+
+### Deployment Security
+- Implement proper deployment procedures
+- Use secure deployment practices
+- Use proper configuration management
+- Implement proper monitoring
