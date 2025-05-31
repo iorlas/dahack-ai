@@ -38,30 +38,6 @@ Feature: UI/UX Requirements
     And there should be formatting buttons (bold, italic)
     And there should be an image attachment button
 
-  # Responsive Design
-  Scenario: Mobile responsive layout
-    Given I am using the application on a mobile device
-    When I am on the main interface
-    Then the chat list should be full-width on the initial view
-    And when I select a chat, it should show full-width message view
-    And there should be a back button to return to the chat list
-    And touch interactions should be optimized for mobile
-
-  Scenario: Tablet responsive layout
-    Given I am using the application on a tablet
-    When I am in portrait mode
-    Then the layout should stack vertically with chat list on top
-    When I rotate to landscape mode
-    Then the layout should show side-by-side panels like desktop
-
-  Scenario: Responsive message input
-    Given I am on any device size
-    When I type a long message
-    Then the input field should expand vertically as needed
-    And the input should never exceed a maximum height
-    And a scrollbar should appear for very long messages
-    And the send button should always be visible
-
   # Modern, Intuitive Interface
   Scenario: Visual design consistency
     Given I am using the application

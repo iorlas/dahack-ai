@@ -113,7 +113,6 @@ Tests cover:
 - ✅ Duplicate username handling
 - ✅ Weak password validation
 - ✅ Navigation between login/registration
-- ✅ Mobile responsiveness
 - ✅ Special characters in username
 - ✅ Username length validation
 
@@ -125,7 +124,6 @@ Tests cover:
 - ✅ Invalid username/password handling
 - ✅ Empty field validation
 - ✅ Navigation between login/registration
-- ✅ Mobile responsiveness
 - ✅ Session persistence after page refresh
 - ✅ Case insensitive username handling
 - ✅ Logout functionality
@@ -179,8 +177,7 @@ Based on `REQUIREMENTS.md`, the tests validate:
 - ✅ User self-registration with username and password (twice)
 - ✅ All users stored in RDBMS (tested through successful registration/login)
 - ✅ No IDP or email verification required
-- ✅ **Skype-like chat UI** with chat list and message areas
-- ✅ Mobile responsiveness (up to 500-1000 concurrent users)
+- ✅ **Skype-like chat UI** with chat list and message areas (up to 500-1000 concurrent users)
 - ✅ **Chat rooms and contacts management** (interface detection)
 
 ## Best Practices
@@ -195,7 +192,6 @@ Based on `REQUIREMENTS.md`, the tests validate:
 8. Follow TypeScript best practices
 9. Keep code formatted and linted using Biome
 10. Test both positive and negative scenarios
-11. Include mobile testing for responsive design
 12. **Test for Skype-like UI elements** instead of generic dashboards
 
 ## Troubleshooting

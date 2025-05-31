@@ -78,10 +78,13 @@ export default function ChatPage() {
 
       <div className="flex h-screen">
         {/* Sidebar */}
-        <div className="w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700">
+        <div
+          className="w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700"
+          data-testid="chat-sidebar"
+        >
           <div className="p-4">
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Chats</h2>
-            <div className="space-y-2">
+            <div className="space-y-2" data-testid="chat-list">
               <div className="p-2 rounded-lg bg-gray-100 dark:bg-gray-700">
                 <p className="text-sm font-medium text-gray-900 dark:text-white">General</p>
                 <p className="text-xs text-gray-500 dark:text-gray-400">Welcome to the chat!</p>
@@ -91,8 +94,8 @@ export default function ChatPage() {
         </div>
 
         {/* Main chat area */}
-        <div className="flex-1 flex flex-col">
-          <div className="flex-1 p-4">
+        <div className="flex-1 flex flex-col" data-testid="chat-interface">
+          <div className="flex-1 p-4" data-testid="message-area">
             <div className="text-center text-gray-500 dark:text-gray-400">
               <h3 className="text-lg font-medium mb-2">Welcome to DAHack AI Chat!</h3>
               <p>Welcome {user?.username || 'User'}! Start chatting with your team.</p>

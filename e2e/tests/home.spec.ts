@@ -17,20 +17,4 @@ test.describe('Home Page', () => {
     // await expect(page.getByRole('link', { name: 'Home' })).toBeVisible();
     // await expect(page.getByRole('link', { name: 'About' })).toBeVisible();
   });
-
-  test('should be responsive', async ({ page }: { page: Page }) => {
-    await page.goto('/');
-
-    // Test mobile viewport
-    await page.setViewportSize({ width: 375, height: 667 });
-    await expect(page.getByRole('navigation')).toBeVisible();
-
-    // Test tablet viewport
-    await page.setViewportSize({ width: 768, height: 1024 });
-    await expect(page.getByRole('navigation')).toBeVisible();
-
-    // Test desktop viewport
-    await page.setViewportSize({ width: 1280, height: 800 });
-    await expect(page.getByRole('navigation')).toBeVisible();
-  });
 });

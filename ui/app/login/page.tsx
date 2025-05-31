@@ -37,21 +37,25 @@ export default function LoginPage() {
     }
 
     try {
-      await loginMutation.mutateAsync({
+      const result = await loginMutation.mutateAsync({
         username: formData.username,
         password: formData.password,
       });
 
+      // Token is already stored in localStorage by the useLogin hook
       // Redirect to chat
       router.push('/chat');
     } catch (err) {
       if (err instanceof Error) {
-        if (err.message.includes('401')) {
-          setError('Invalid username or password');
-        } else if (err.message.includes('Validation error')) {
+        const errorMessage = err.message.toLowerCase();
+        if (errorMessage.includes('401') || errorMessage.includes('unauthorized') || errorMessage.includes('invalid')) {
+          setError('Invalid credentials');
+        } else if (errorMessage.includes('user not found') || errorMessage.includes('404')) {
+          setError('User not found');
+        } else if (errorMessage.includes('validation error')) {
           setError(err.message.replace('Validation error: ', ''));
         } else {
-          setError('Login failed. Please try again.');
+          setError('Login failed');
         }
       } else {
         setError('Network error. Please try again.');
@@ -76,7 +80,7 @@ export default function LoginPage() {
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="rounded-md shadow-sm -space-y-px">
             <div>
-              <label htmlFor="username" className="sr-only">
+              <label htmlFor="username" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Username
               </label>
               <input
@@ -90,7 +94,7 @@ export default function LoginPage() {
               />
             </div>
             <div>
-              <label htmlFor="password" className="sr-only">
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Password
               </label>
               <input
