@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 """Database migration runner."""
+
 import asyncio
 import os
 import sys
-import time
 from pathlib import Path
 
 import asyncpg
@@ -20,10 +20,10 @@ async def wait_for_db(database_url: str, max_retries: int = 30):
             await conn.close()
             logger.info("database_ready")
             return True
-        except Exception as e:
-            logger.info("waiting_for_database", attempt=i+1, max_retries=max_retries)
+        except Exception:
+            logger.info("waiting_for_database", attempt=i + 1, max_retries=max_retries)
             await asyncio.sleep(1)
-    
+
     logger.error("database_not_ready")
     return False
 
@@ -41,7 +41,7 @@ async def run_sql_migrations(database_url: str):
         return True
 
     conn = await asyncpg.connect(database_url)
-    
+
     try:
         # Create migrations tracking table
         await conn.execute("""
@@ -53,36 +53,32 @@ async def run_sql_migrations(database_url: str):
 
         for sql_file in sql_files:
             filename = sql_file.name
-            
+
             # Check if migration was already applied
             result = await conn.fetchval(
-                "SELECT COUNT(*) FROM _sql_migrations WHERE filename = $1",
-                filename
+                "SELECT COUNT(*) FROM _sql_migrations WHERE filename = $1", filename
             )
-            
+
             if result > 0:
                 logger.info("migration_already_applied", filename=filename)
                 continue
 
             logger.info("applying_migration", filename=filename)
-            
+
             # Read and execute SQL file
             sql_content = sql_file.read_text()
-            
+
             # Execute in a transaction
             async with conn.transaction():
                 await conn.execute(sql_content)
-                
+
                 # Record migration as applied
-                await conn.execute(
-                    "INSERT INTO _sql_migrations (filename) VALUES ($1)",
-                    filename
-                )
-            
+                await conn.execute("INSERT INTO _sql_migrations (filename) VALUES ($1)", filename)
+
             logger.info("migration_applied", filename=filename)
-        
+
         return True
-        
+
     except Exception as e:
         logger.error("migration_failed", error=str(e))
         return False
@@ -97,15 +93,15 @@ async def main():
     db_pass = os.getenv("POSTGRES_PASSWORD", "postgres")
     db_host = os.getenv("POSTGRES_SERVER", "localhost")
     db_name = os.getenv("POSTGRES_DB", "app")
-    
+
     database_url = f"postgresql://{db_user}:{db_pass}@{db_host}/{db_name}"
-    
+
     logger.info("starting_migrations", host=db_host, database=db_name)
-    
+
     # Wait for database
     if not await wait_for_db(database_url):
         sys.exit(1)
-    
+
     # Run migrations
     if await run_sql_migrations(database_url):
         logger.info("migrations_completed")
@@ -116,4 +112,4 @@ async def main():
 
 
 if __name__ == "__main__":
-    asyncio.run(main()) 
+    asyncio.run(main())

@@ -18,18 +18,18 @@ MIGRATION_EXIT_CODE=$?
 
 if [ $MIGRATION_EXIT_CODE -eq 0 ]; then
     echo -e "\n✓ Migrations completed successfully!"
-    
+
     # Check if users table exists
     echo -e "\n3. Verifying users table exists..."
     docker-compose exec -T db psql -U postgres -d app -c "\dt users" | grep -q "users"
-    
+
     if [ $? -eq 0 ]; then
         echo "✓ Users table created successfully!"
-        
+
         # Check migration tracking table
         echo -e "\n4. Checking migration tracking..."
-        docker-compose exec -T db psql -U postgres -d app -c "SELECT * FROM _sql_migrations;" 
-        
+        docker-compose exec -T db psql -U postgres -d app -c "SELECT * FROM _sql_migrations;"
+
         echo -e "\n✓ All tests passed! Migration system is working correctly."
     else
         echo "✗ Users table not found!"
@@ -44,4 +44,4 @@ fi
 echo -e "\n5. Cleaning up..."
 docker-compose down
 
-echo -e "\nTest completed!" 
+echo -e "\nTest completed!"

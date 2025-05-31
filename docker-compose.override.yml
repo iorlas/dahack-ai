@@ -24,4 +24,4 @@ services:
       - ./api:/app
       - /app/.venv
       # Mount migrations for live updates
-      - ./api/migrations:/app/migrations:ro 
+      - ./api/migrations:/app/migrations:ro

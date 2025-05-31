@@ -34,6 +34,9 @@ class UserResponse(BaseModel):
     class Config:
         from_attributes = True
 
+    class Config:
+        from_attributes = True
+
     id: int
     username: str
     is_active: bool
