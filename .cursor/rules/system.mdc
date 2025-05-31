@@ -1,0 +1,137 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# C1 — System Context Diagram
+High-level view: how the system interacts with users and external services
+
+```
+graph TD
+    User["User (Web Browser)"]
+
+    subgraph Application
+        UI["Next.js SPA (React)"]
+        Backend["FastAPI Backend (REST + WebSocket)"]
+    end
+
+    subgraph "External Services"
+        PG["PostgreSQL"]
+        S3["S3 or MinIO"]
+        REDIS["Redis Pub/Sub (ElastiCache)"]
+        Cloud["AWS Cloud (ECS, ALB, RDS, etc)"]
+    end
+
+    User -->|"HTTP (JWT Auth)"| UI
+    UI -->|REST API + WebSocket| Backend
+    User -->|"WebSocket (JWT Token)"| Backend
+
+    Backend -->|Query/Store| PG
+    Backend -->|Upload/Download| S3
+    Backend -->|Pub/Sub| REDIS
+
+    DevOps["DevOps / IaC Admin"] -->|Provision| Cloud
+```
+
+# C2 - Container Diagram
+
+
+```
+graph TB
+
+    subgraph "User Browser"
+        NextJSApp["Next.js SPA"]
+        WebSocketClient["WebSocket (wss://.../ws/rooms/{id}?token=JWT)"]
+    end
+
+    subgraph "FastAPI Backend (Docker Container)"
+        APIRouter["FastAPI API Router"]
+        WSHandler["WebSocket Endpoint (/ws/rooms/{id})"]
+        AuthService["JWT Auth Service"]
+        RoomService["Room/Group Service"]
+        MessageService["Message Service"]
+        UploadService["S3 Upload Handler"]
+        TortoiseORM["Tortoise ORM"]
+        RedisClient["Redis Pub/Sub Client"]
+    end
+
+    subgraph "Infrastructure"
+        PG["PostgreSQL"]
+        S3["S3 / MinIO"]
+        REDIS["Redis Pub/Sub"]
+    end
+
+    NextJSApp -->|HTTP| APIRouter
+    WebSocketClient -->|WebSocket| WSHandler
+
+    APIRouter --> AuthService
+    APIRouter --> RoomService
+    APIRouter --> MessageService
+    APIRouter --> UploadService
+
+    WSHandler --> AuthService
+    WSHandler --> RoomService
+    WSHandler --> MessageService
+    WSHandler --> RedisClient
+
+    MessageService --> TortoiseORM
+    RoomService --> TortoiseORM
+    UploadService --> S3
+    TortoiseORM --> PG
+```
+
+# C3 – Component Diagram (FastAPI Internals)
+
+```
+graph LR
+
+    subgraph "FastAPI Core"
+        Router["API Router (/auth, /rooms, /messages, /uploads)"]
+        WebSocketManager["WebSocket Handler (/ws/rooms/{room_id})"]
+    end
+
+    subgraph "Services"
+        AuthService["Auth Service (JWT)"]
+        RoomService["Room Service (ACL, Mutual Contacts, Groups)"]
+        MessageService["Message Service (Store, Deliver, Search)"]
+        UploadService["Upload Service (Presigned S3 URLs)"]
+    end
+
+    subgraph "Infrastructure"
+        RedisPub["Redis Pub/Sub Client"]
+        PG["PostgreSQL via Tortoise ORM"]
+        S3Client["S3 Client (Boto3 or MinIO SDK)"]
+    end
+
+    Router --> AuthService
+    Router --> RoomService
+    Router --> MessageService
+    Router --> UploadService
+
+    WebSocketManager --> AuthService
+    WebSocketManager --> RoomService
+    WebSocketManager --> RedisPub
+    WebSocketManager --> MessageService
+
+    AuthService --> PG
+    RoomService --> PG
+    MessageService --> PG
+    UploadService --> S3Client
+```
+
+# NFRs
+
+Up to 500-1000 simultaneously connected users
+
+Up to 50 messages per second (including group messages)
+
+Images should be stored in cloud blob storage.
+
+Advanced feature: Try to use websocket when it is possible. When websocket are not possible (e.g. user is behind some proxy – use regular pooling)
+Message DB should be persistent with transactional integrity. To simplify things – use PostgreSQL as a message storage unless you believe you have better solution (do not use cloud only storages like DynamoDB).
+
+Solution should cover both backend and frontend parts. Frontend implementation could be based on technology of your choice, could be SPA or server pages.
+
+Because we have to compare and assess solutions, on backend use one of the common production grade runtimes (Java/.Net/Node+TS ..)
+
+Do not overcomplicate deployment, deploying docker image to Fargate (or even EC2) is OK. Try to keep solution cloud agnostic (remember it should be runnable on local machine)
