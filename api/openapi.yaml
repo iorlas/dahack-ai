@@ -369,6 +369,52 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+  /v1/messages/rooms/{room_id}/history:
+    get:
+      tags:
+      - messages
+      summary: Get Message History
+      description: Get message history for a room.
+      operationId: get_message_history_v1_messages_rooms__room_id__history_get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: room_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Room Id
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 100
+          minimum: 1
+          default: 50
+          title: Limit
+      - name: before_id
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Before Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageHistoryResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
 components:
   schemas:
     ContactInvite:
@@ -460,6 +506,58 @@ components:
       - created_at
       - updated_at
       title: InvitationResponse
+    MessageHistoryResponse:
+      properties:
+        messages:
+          items:
+            $ref: '#/components/schemas/MessageResponse'
+          type: array
+          title: Messages
+        has_more:
+          type: boolean
+          title: Has More
+      type: object
+      required:
+      - messages
+      - has_more
+      title: MessageHistoryResponse
+    MessageResponse:
+      properties:
+        id:
+          type: integer
+          title: Id
+        room_id:
+          type: integer
+          title: Room Id
+        sender:
+          $ref: '#/components/schemas/UserResponse'
+        content:
+          type: string
+          title: Content
+        edited_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Edited At
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+        updated_at:
+          type: string
+          format: date-time
+          title: Updated At
+      type: object
+      required:
+      - id
+      - room_id
+      - sender
+      - content
+      - edited_at
+      - created_at
+      - updated_at
+      title: MessageResponse
     RoomAddMembers:
       properties:
         usernames:

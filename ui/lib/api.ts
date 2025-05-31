@@ -118,6 +118,22 @@ export interface RoomListResponse {
   rooms: RoomResponse[];
 }
 
+// Message interfaces
+export interface MessageResponse {
+  id: number;
+  room_id: number;
+  sender: User;
+  content: string;
+  edited_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface MessageHistoryResponse {
+  messages: MessageResponse[];
+  has_more: boolean;
+}
+
 // Enhanced error handling
 const handleApiError = async (response: Response) => {
   if (response.status === 422) {
@@ -429,6 +445,31 @@ export const roomApi = {
   },
 };
 
+// Message API functions
+export const messageApi = {
+  getMessageHistory: async (
+    roomId: number,
+    params?: {
+      limit?: number;
+      before_id?: number;
+    }
+  ) => {
+    const searchParams = new URLSearchParams();
+    if (params?.limit !== undefined) searchParams.set('limit', String(params.limit));
+    if (params?.before_id !== undefined) searchParams.set('before_id', String(params.before_id));
+
+    const response = await fetch(`${API_URL}/v1/messages/rooms/${roomId}/history?${searchParams.toString()}`, {
+      headers: getAuthHeaders(),
+    });
+
+    if (response.status !== 200) {
+      await handleApiError(response);
+    }
+
+    return response.json() as Promise<MessageHistoryResponse>;
+  },
+};
+
 // React Query hooks
 export const useTodos = (params?: {
   completed?: boolean;
@@ -617,5 +658,20 @@ export const useLeaveRoom = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['rooms'] });
     },
+  });
+};
+
+// Message hooks
+export const useMessageHistory = (
+  roomId: number,
+  params?: {
+    limit?: number;
+    before_id?: number;
+  }
+) => {
+  return useQuery({
+    queryKey: ['messageHistory', roomId, params],
+    queryFn: () => messageApi.getMessageHistory(roomId, params),
+    enabled: !!roomId && typeof window !== 'undefined' && !!localStorage.getItem('access_token'),
   });
 };
