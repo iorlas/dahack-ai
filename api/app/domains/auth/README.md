@@ -121,6 +121,81 @@ Response: 200 OK
 }
 ```
 
+### Rooms
+
+#### 8. Create Room
+```
+POST /v1/rooms
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "name": "Room Name",
+  "member_usernames": ["username1", "username2"]  // optional
+}
+
+Response: 201 Created
+{
+  "id": 1,
+  "name": "Room Name",
+  "owner": { /* user object */ },
+  "is_system": false,
+  "members": [{ /* member objects */ }],
+  "created_at": "2024-01-01T00:00:00",
+  "updated_at": "2024-01-01T00:00:00"
+}
+```
+
+#### 9. Get All Rooms
+```
+GET /v1/rooms
+Authorization: Bearer <token>
+
+Response: 200 OK
+{
+  "rooms": [{ /* room objects */ }]
+}
+```
+
+#### 10. Get Specific Room
+```
+GET /v1/rooms/{room_id}
+Authorization: Bearer <token>
+
+Response: 200 OK
+{ /* room object */ }
+```
+
+#### 11. Add Members to Room
+```
+POST /v1/rooms/{room_id}/members
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "usernames": ["username1", "username2"]
+}
+
+Response: 200 OK
+{ /* updated room object */ }
+```
+
+#### 12. Leave Room
+```
+POST /v1/rooms/{room_id}/leave
+Authorization: Bearer <token>
+
+Response: 204 No Content
+```
+
+#### 13. Delete Room
+```
+DELETE /v1/rooms/{room_id}
+Authorization: Bearer <token>
+
+Response: 204 No Content
+```
+
 ## Contact Flow
 
 1. User A sends invitation to User B
@@ -128,6 +203,12 @@ Response: 200 OK
 3. User B accepts or rejects the invitation
 4. If accepted, both users see each other in `contacts`
 5. If User B had already invited User A, the invitation auto-accepts
+6. When accepted, a system room is automatically created for the two users
+
+## Room Types
+
+1. **System Rooms**: Auto-created when contacts connect, always 2 users, cannot be modified
+2. **User Rooms**: Created manually, owner can add/remove members from contacts
 
 ## Security Features
 

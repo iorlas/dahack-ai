@@ -9,6 +9,7 @@ from app.core.redis import redis_service
 from app.core.s3 import s3_service
 from app.domains.auth.api import router as auth_router
 from app.domains.auth.contacts_api import router as contacts_router
+from app.domains.auth.rooms_api import router as rooms_router
 from app.domains.health.api import router as health_router
 from app.domains.todos.api import router as todos_router
 
@@ -59,3 +60,4 @@ app.include_router(health_router, prefix="/v1")
 app.include_router(todos_router, prefix="/v1")
 app.include_router(auth_router, prefix="/v1")
 app.include_router(contacts_router, prefix="/v1")
+app.include_router(rooms_router, prefix="/v1")
