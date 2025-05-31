@@ -36,5 +36,5 @@ app.add_middleware(
 )
 
 # Include domain routers
-app.include_router(health_router, prefix="/api/v1/health")
-app.include_router(todos_router, prefix="/api/v1/todos")
+app.include_router(health_router, prefix="/v1")
+app.include_router(todos_router, prefix="/v1")

@@ -1,13 +1,16 @@
 version: '3.9'
 
+x-common-variables: &common-variables
+  POSTGRES_USER: postgres
+  POSTGRES_PASSWORD: postgres
+  POSTGRES_DB: app
+
 services:
   db:
     image: postgres:15
     restart: always
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: app
+      <<: *common-variables
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
@@ -21,28 +24,42 @@ services:
   api:
     build:
       context: ./api
-    command: [ "uv", "run", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload" ]
+      target: ${API_TARGET:-development}
     volumes:
       - ./api:/app
       - /app/.venv
     environment:
       POSTGRES_SERVER: db
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: app
+      <<: *common-variables
       SECRET_KEY: your-secret-key-here
-      ENVIRONMENT: development
+      ENVIRONMENT: ${ENVIRONMENT:-development}
     ports:
       - "8000:8000"
     depends_on:
       db:
         condition: service_healthy
     healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:8000/v1/health" ]
+      test: [ "CMD", "curl", "-f", "http://localhost:8000/v1/healthz" ]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 40s
+
+  ui:
+    build:
+      context: ./ui
+      target: ${UI_TARGET:-development}
+    volumes:
+      - ./ui:/app
+      - /app/node_modules
+    environment:
+      - NEXT_PUBLIC_API_URL=http://api:8000
+      - NODE_ENV=${NODE_ENV:-development}
+    ports:
+      - "3000:3000"
+    depends_on:
+      api:
+        condition: service_healthy
 
 volumes:
   postgres_data:
