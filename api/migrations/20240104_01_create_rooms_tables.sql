@@ -25,4 +25,4 @@ CREATE INDEX idx_room_members_user_id ON room_members(user_id);
 
 -- Create updated_at trigger for rooms
 CREATE TRIGGER update_rooms_updated_at BEFORE UPDATE
-    ON rooms FOR EACH ROW EXECUTE FUNCTION update_updated_at_column(); 
+    ON rooms FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
