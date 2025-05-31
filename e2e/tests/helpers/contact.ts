@@ -81,9 +81,11 @@ export class ContactHelper {
 
     /**
      * Navigate to pending requests
+     * @deprecated Pending requests are now integrated into the contacts list
      */
     async goToPendingRequests(): Promise<void> {
-        await this.page.getByRole('button', { name: /pending requests/i }).click();
+        // No longer needed - invitations appear directly in contacts list
+        await this.goToContacts();
     }
 
     /**
@@ -98,15 +100,11 @@ export class ContactHelper {
     }
 
     /**
-     * Check if contact request is pending
+     * Check if there's a contact request from a specific user
      */
-    async hasContactRequest(username: string): Promise<boolean> {
-        try {
-            await this.goToPendingRequests();
-            return await this.page.getByTestId(`request-${username}`).isVisible();
-        } catch {
-            return false;
-        }
+    async hasContactRequest(fromUsername: string): Promise<boolean> {
+        const requestElement = this.page.getByTestId(`request-${fromUsername}`);
+        return await requestElement.isVisible().catch(() => false);
     }
 
     /**

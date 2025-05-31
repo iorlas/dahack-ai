@@ -80,6 +80,10 @@ test.describe('Contact Management', () => {
 
         await page.reload();
         await contactHelper.goToContacts();
+
+        // Invitation should be visible directly in contacts list
+        expect(await contactHelper.hasContactRequest(bob.username)).toBeTruthy();
+
         await contactHelper.acceptContactRequest(bob.username);
 
         // Bob should appear in contact list
@@ -92,12 +96,16 @@ test.describe('Contact Management', () => {
 
         await page.reload();
         await contactHelper.goToContacts();
+
+        // Invitation should be visible directly in contacts list
+        expect(await contactHelper.hasContactRequest(charlie.username)).toBeTruthy();
+
         await contactHelper.declineContactRequest(charlie.username);
 
         // Charlie should not appear in contact list
         expect(await contactHelper.isContactInList(charlie.username)).toBeFalsy();
 
-        // Request should be removed from pending
+        // Request should be removed
         expect(await contactHelper.hasContactRequest(charlie.username)).toBeFalsy();
     });
 
@@ -167,16 +175,19 @@ test.describe('Contact Management', () => {
         expect(errorMessage).toMatch(/cannot add yourself/i);
     });
 
-    test('should display pending requests section', async ({ page }: { page: Page }) => {
+    test('should display pending requests in contacts list', async ({ page }: { page: Page }) => {
         // Create contact request from bob to alice
         await contactHelper.createContactRequestViaAPI(bob, alice.username);
 
         await page.reload();
         await contactHelper.goToContacts();
-        await contactHelper.goToPendingRequests();
 
-        // Should see pending request
+        // Should see pending invitation directly in contacts list
         expect(await contactHelper.hasContactRequest(bob.username)).toBeTruthy();
+
+        // Should see the orange invitation styling
+        const invitation = page.getByTestId(`request-${bob.username}`);
+        await expect(invitation).toHaveClass(/bg-orange-50|border-orange-200/);
     });
 
     test('should handle empty contact list state', async ({ page }: { page: Page }) => {
@@ -189,10 +200,13 @@ test.describe('Contact Management', () => {
 
     test('should handle empty pending requests state', async ({ page }: { page: Page }) => {
         await contactHelper.goToContacts();
-        await contactHelper.goToPendingRequests();
 
-        // Should see empty state message
-        const emptyState = page.getByText(/no pending requests/i);
+        // When no invitations exist, should only see the empty contacts message
+        const emptyState = page.getByText(/no contacts yet|start by adding/i);
         await expect(emptyState).toBeVisible();
+
+        // Should not see any invitation elements
+        const invitations = page.locator('[data-testid^="request-"]');
+        await expect(invitations).toHaveCount(0);
     });
 });

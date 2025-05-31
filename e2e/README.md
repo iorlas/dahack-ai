@@ -67,6 +67,8 @@ pnpm check
   - `user-login.spec.ts` - Tests for user login functionality
   - `helpers/` - Test helper utilities
     - `auth.ts` - Authentication helper functions and utilities
+  - `contact-management.spec.ts` - Contact invitation and management tests
+  - `room-management.spec.ts` - **NEW** Room and chat functionality tests
 
 ## Configuration
 
@@ -201,3 +203,77 @@ Based on `REQUIREMENTS.md`, the tests validate:
 - Use `pnpm test:ui` to debug test execution visually
 - Check browser console for JavaScript errors during test runs
 - **Ensure chat interface elements have proper data-testid attributes** for reliable testing
+
+## Room Management Tests
+
+The new `room-management.spec.ts` covers:
+
+### 🔀 **Tab Navigation**
+- Switching between contacts and rooms tabs
+- Correct action button display for each tab
+
+### 🏢 **Multi-user Room Creation**
+- Creating rooms without members
+- Creating rooms with initial members
+- Validation errors for empty room names
+- Canceling room creation
+
+### 💬 **Chat Interface**
+- **1-on-1 Contact Chats**: Clicking contacts opens 1-on-1 chat
+- **Multi-user Rooms**: Room selection and group chat interface
+- Proper message input placeholders
+- Room action buttons (Room Info, Leave Room)
+
+### 🔍 **Search and Filtering**
+- Room search by name
+- Empty search results handling
+- Contact vs room filtering
+
+### ⚙️ **Room Management Actions**
+- Leaving rooms
+- Room info display
+- Member count display
+
+### 🎨 **UI States**
+- Empty states for no rooms/contacts
+- Selection highlighting
+- Welcome messages
+- Proper room/contact count display
+
+### 🔄 **Selection Management**
+- Switching between rooms and contacts
+- Maintaining selection state
+- Proper chat title updates
+
+## Test Data Setup
+
+Tests use the `RoomHelper` class for:
+- Creating rooms via API for test setup
+- Managing room membership
+- Room navigation and interaction
+- Message sending simulation
+
+The helper supports both UI interactions and API calls for efficient test setup.
+
+## Key Features Tested
+
+✅ **Two Chat Types**:
+- 1-on-1 contact chats (click contact → opens direct chat)
+- Multi-user rooms (group chats with multiple participants)
+
+✅ **Room Creation**:
+- Empty rooms
+- Rooms with initial members
+- Error handling
+
+✅ **Navigation**:
+- Tab switching (Contacts ↔ Rooms)
+- Chat selection and highlighting
+- Search functionality
+
+✅ **Chat Interface**:
+- Proper message areas
+- Context-appropriate placeholders
+- Room-specific action buttons
+
+The tests ensure the Skype-like chat experience works correctly for both direct messaging and group communication.

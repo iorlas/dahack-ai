@@ -89,6 +89,35 @@ export interface MutualContactCheck {
   is_mutual_contact: boolean;
 }
 
+// Room interfaces
+export interface RoomCreate {
+  name: string;
+  member_usernames?: string[];
+}
+
+export interface RoomAddMembers {
+  usernames: string[];
+}
+
+export interface RoomMemberResponse {
+  user: User;
+  joined_at: string;
+}
+
+export interface RoomResponse {
+  id: number;
+  name: string | null;
+  owner: User | null;
+  is_system: boolean;
+  members: RoomMemberResponse[];
+  created_at: string;
+  updated_at: string;
+}
+
+export interface RoomListResponse {
+  rooms: RoomResponse[];
+}
+
 // Enhanced error handling
 const handleApiError = async (response: Response) => {
   if (response.status === 422) {
@@ -313,6 +342,93 @@ export const contactApi = {
   },
 };
 
+// Room API functions
+export const roomApi = {
+  getRooms: async () => {
+    const response = await fetch(`${API_URL}/v1/rooms`, {
+      headers: getAuthHeaders(),
+    });
+
+    if (response.status !== 200) {
+      await handleApiError(response);
+    }
+
+    return response.json() as Promise<RoomListResponse>;
+  },
+
+  getRoom: async (roomId: number) => {
+    const response = await fetch(`${API_URL}/v1/rooms/${roomId}`, {
+      headers: getAuthHeaders(),
+    });
+
+    if (response.status !== 200) {
+      await handleApiError(response);
+    }
+
+    return response.json() as Promise<RoomResponse>;
+  },
+
+  createRoom: async (room: RoomCreate) => {
+    const response = await fetch(`${API_URL}/v1/rooms`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...getAuthHeaders(),
+      },
+      body: JSON.stringify(room),
+    });
+
+    if (response.status !== 201) {
+      await handleApiError(response);
+    }
+
+    return response.json() as Promise<RoomResponse>;
+  },
+
+  deleteRoom: async (roomId: number) => {
+    const response = await fetch(`${API_URL}/v1/rooms/${roomId}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders(),
+    });
+
+    if (response.status !== 204) {
+      await handleApiError(response);
+    }
+
+    // 204 No Content - no response body expected
+  },
+
+  addMembers: async (roomId: number, members: RoomAddMembers) => {
+    const response = await fetch(`${API_URL}/v1/rooms/${roomId}/members`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...getAuthHeaders(),
+      },
+      body: JSON.stringify(members),
+    });
+
+    if (response.status !== 200) {
+      await handleApiError(response);
+    }
+
+    return response.json() as Promise<RoomResponse>;
+  },
+
+  leaveRoom: async (roomId: number) => {
+    const response = await fetch(`${API_URL}/v1/rooms/${roomId}/leave`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+    });
+
+    if (response.status !== 204) {
+      await handleApiError(response);
+    }
+
+    // 204 No Content - no response body expected
+  },
+};
+
 // React Query hooks
 export const useTodos = (params?: {
   completed?: boolean;
@@ -438,5 +554,68 @@ export const useMutualContactCheck = (username: string) => {
     queryKey: ['mutualContact', username],
     queryFn: () => contactApi.checkMutualContact(username),
     enabled: !!username && typeof window !== 'undefined' && !!localStorage.getItem('access_token'),
+  });
+};
+
+// Room hooks
+export const useRooms = () => {
+  return useQuery({
+    queryKey: ['rooms'],
+    queryFn: roomApi.getRooms,
+    enabled: typeof window !== 'undefined' && !!localStorage.getItem('access_token'),
+  });
+};
+
+export const useRoom = (roomId: number) => {
+  return useQuery({
+    queryKey: ['room', roomId],
+    queryFn: () => roomApi.getRoom(roomId),
+    enabled: !!roomId && typeof window !== 'undefined' && !!localStorage.getItem('access_token'),
+  });
+};
+
+export const useCreateRoom = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: roomApi.createRoom,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['rooms'] });
+    },
+  });
+};
+
+export const useDeleteRoom = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: roomApi.deleteRoom,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['rooms'] });
+    },
+  });
+};
+
+export const useAddMembers = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ roomId, members }: { roomId: number; members: RoomAddMembers }) =>
+      roomApi.addMembers(roomId, members),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['rooms'] });
+      queryClient.invalidateQueries({ queryKey: ['room', data.id] });
+    },
+  });
+};
+
+export const useLeaveRoom = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: roomApi.leaveRoom,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['rooms'] });
+    },
   });
 };
